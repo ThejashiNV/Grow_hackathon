@@ -127,3 +127,90 @@ export interface HistoryResponse {
   entries: HistoryEntry[];
   total: number;
 }
+
+// ── Market Intelligence ──────────────────────────────────────────────
+
+export interface HorizonAnalysis {
+  period: string;
+  trading_days: number;
+  start_date: string;
+  end_date: string;
+  start_price: number;
+  end_price: number;
+  return_pct: number;
+  annualized_volatility: number;
+  max_drawdown_pct: number;
+  avg_daily_volume: number | null;
+  volume_vs_baseline: number | null;
+  large_move_count: number;
+  trend: string;
+  momentum_score: number;
+}
+
+export interface AnomalousMove {
+  date: string;
+  close: number;
+  change_pct: number;
+  volume: number | null;
+  volume_ratio: number | null;
+  direction: string;
+  magnitude_sigma: number;
+  return_1d: number | null;
+  return_1w: number | null;
+  return_2w: number | null;
+  return_1m: number | null;
+  associated_event: string | null;
+}
+
+export interface PatternDiscovery {
+  pattern_type: string;
+  description: string;
+  confidence: number;
+  observations: number;
+  period_analyzed: string;
+  details: Record<string, unknown> | null;
+}
+
+export interface RegimeChange {
+  metric: string;
+  current_value: number;
+  baseline_value: number;
+  ratio: number;
+  description: string;
+  period_compared: string;
+}
+
+export interface RareEvent {
+  date: string;
+  change_pct: number;
+  description: string;
+  recovery_days: number | null;
+  severity: string;
+}
+
+export interface ExpectedVsActual {
+  description: string;
+  historical_avg_move: number;
+  historical_observations: number;
+  current_move: number | null;
+  deviation: string;
+}
+
+export interface StockIntelligence {
+  symbol: string;
+  company_name: string | null;
+  sector: string | null;
+  data_start: string | null;
+  data_end: string | null;
+  total_trading_days: number;
+  current_price: number | null;
+  horizons: HorizonAnalysis[];
+  anomalous_moves: AnomalousMove[];
+  patterns: PatternDiscovery[];
+  regime_changes: RegimeChange[];
+  rare_events: RareEvent[];
+  expected_vs_actual: ExpectedVsActual[];
+  generated_at: string;
+  data_source: string;
+  confidence_note: string;
+}

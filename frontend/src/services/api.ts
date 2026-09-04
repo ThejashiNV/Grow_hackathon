@@ -1,4 +1,4 @@
-import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, HistoryResponse, Watchlist } from "../types/api";
+import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, HistoryResponse, StockIntelligence, Watchlist } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -65,4 +65,9 @@ export const api = {
 
   getHistory: (filter: string = "all") =>
     request<HistoryResponse>(`/api/history?filter=${encodeURIComponent(filter)}`),
+
+  getIntelligence: (symbol: string, refresh = false) =>
+    request<StockIntelligence>(
+      `/api/intelligence/${encodeURIComponent(symbol)}${refresh ? "?refresh=true" : ""}`
+    ),
 };

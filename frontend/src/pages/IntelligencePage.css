@@ -1,0 +1,390 @@
+/* ── page header ────────────────────────────────────────────────────── */
+
+.intel-header { margin-bottom: 1rem; }
+.intel-header h2 { margin: 0 0 0.25rem 0; font-size: 1.3rem; }
+.intel-subtitle { color: #a3a3a3; margin: 0; font-size: 0.9rem; }
+
+/* ── selector ──────────────────────────────────────────────────────── */
+
+.intel-selector { margin-bottom: 1.25rem; }
+
+.intel-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.intel-search input {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #e5e5e5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.intel-search input:focus {
+  border-color: #60a5fa;
+  outline: none;
+}
+
+.intel-search button {
+  background: #1a1a2e;
+  border: 1px solid #60a5fa;
+  color: #60a5fa;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.intel-search button:hover:not(:disabled) { background: #252545; }
+.intel-search button:disabled { opacity: 0.5; cursor: default; }
+
+.intel-quickselect { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.quick-btn {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #a3a3a3;
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.quick-btn:hover { background: #222; color: #e5e5e5; border-color: #555; }
+
+/* ── stock header ──────────────────────────────────────────────────── */
+
+.intel-stock-header {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.intel-stock-header h3 { margin: 0 0 0.3rem 0; font-size: 1.15rem; }
+
+.intel-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #a3a3a3;
+}
+
+.meta-sym { font-weight: 600; color: #e5e5e5; }
+.meta-price { color: #60a5fa; font-weight: 600; }
+.meta-range { color: #737373; font-size: 0.75rem; }
+
+.badge-sector {
+  background: #1a2a1a;
+  border: 1px solid #4ade80;
+  color: #4ade80;
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ── sections ──────────────────────────────────────────────────────── */
+
+.intel-section {
+  margin-bottom: 1.25rem;
+}
+
+.intel-section h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 0.95rem;
+  color: #d4d4d4;
+  border-bottom: 1px solid #2a2a2a;
+  padding-bottom: 0.35rem;
+}
+
+/* ── horizons table ────────────────────────────────────────────────── */
+
+.horizons-table-wrap { overflow-x: auto; }
+
+.horizons-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.horizons-table th {
+  text-align: left;
+  color: #737373;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #2a2a2a;
+  white-space: nowrap;
+}
+
+.horizons-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #1a1a1a;
+  white-space: nowrap;
+}
+
+.horizons-table .period-cell { font-weight: 700; color: #e5e5e5; }
+.horizons-table .pos { color: #22c55e; }
+.horizons-table .neg { color: #ef4444; }
+.horizons-table .neutral { color: #a3a3a3; }
+
+/* ── card grid (regime, patterns, expected) ─────────────────────────── */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.6rem;
+}
+
+/* ── regime cards ──────────────────────────────────────────────────── */
+
+.regime-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #555;
+}
+
+.regime-card.warn { border-left-color: #f97316; }
+.regime-card.cool { border-left-color: #3b82f6; }
+
+.regime-metric {
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #737373;
+  letter-spacing: 0.06em;
+}
+
+.regime-ratio {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e5e5e5;
+  margin: 0.15rem 0;
+}
+
+.regime-desc {
+  font-size: 0.78rem;
+  color: #a3a3a3;
+  margin: 0.2rem 0;
+  line-height: 1.35;
+}
+
+.regime-period {
+  font-size: 0.65rem;
+  color: #555;
+}
+
+/* ── anomalous moves ───────────────────────────────────────────────── */
+
+.anomalous-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.anomalous-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  border-left: 3px solid #555;
+  font-size: 0.78rem;
+}
+
+.anomalous-row.sev-extreme { border-left-color: #ef4444; }
+.anomalous-row.sev-major { border-left-color: #f97316; }
+.anomalous-row.sev-notable { border-left-color: #eab308; }
+
+.anom-date { color: #737373; font-size: 0.72rem; min-width: 75px; }
+.anom-change { font-weight: 700; min-width: 55px; }
+.anom-sigma { color: #a78bfa; font-weight: 600; font-size: 0.72rem; }
+.anom-price { color: #a3a3a3; }
+.anom-vol { color: #f97316; font-size: 0.72rem; }
+.anom-post { color: #737373; font-size: 0.72rem; }
+
+.anom-event {
+  background: #1a1a2e;
+  color: #60a5fa;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+}
+
+.pos { color: #22c55e; }
+.neg { color: #ef4444; }
+
+.show-more {
+  background: none;
+  border: none;
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.4rem 0;
+}
+
+/* ── pattern cards ─────────────────────────────────────────────────── */
+
+.pattern-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.pattern-type {
+  text-transform: capitalize;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #a78bfa;
+  margin-bottom: 0.25rem;
+}
+
+.pattern-desc {
+  font-size: 0.8rem;
+  color: #d4d4d4;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.35;
+}
+
+.pattern-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  color: #737373;
+}
+
+.pattern-period { font-size: 0.6rem; }
+
+.conf-bar {
+  display: inline-block;
+  width: 50px;
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.conf-fill {
+  display: block;
+  height: 100%;
+  background: #4ade80;
+  border-radius: 3px;
+}
+
+/* ── rare events ───────────────────────────────────────────────────── */
+
+.rare-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.rare-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.rare-date { color: #737373; font-size: 0.72rem; min-width: 75px; }
+.rare-change { font-weight: 700; min-width: 55px; }
+.rare-desc { color: #d4d4d4; flex: 1; min-width: 150px; }
+
+.rare-recovery {
+  color: #4ade80;
+  font-size: 0.72rem;
+}
+
+.badge-extreme { background: #ef444430; color: #ef4444; }
+.badge-major { background: #f9731630; color: #f97316; }
+.badge-notable { background: #eab30830; color: #eab308; }
+
+.rare-badge {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ── expected vs actual ────────────────────────────────────────────── */
+
+.expected-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #555;
+}
+
+.expected-card.dev-amplified { border-left-color: #ef4444; }
+.expected-card.dev-muted { border-left-color: #eab308; }
+.expected-card.dev-inline { border-left-color: #22c55e; }
+
+.expected-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.badge-amplified { color: #ef4444; }
+.badge-muted { color: #eab308; }
+.badge-inline { color: #22c55e; }
+.badge-baseline { color: #60a5fa; }
+
+.expected-desc {
+  font-size: 0.78rem;
+  color: #d4d4d4;
+  margin: 0.2rem 0 0.4rem 0;
+  line-height: 1.35;
+}
+
+.expected-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.68rem;
+  color: #737373;
+}
+
+/* ── footer ────────────────────────────────────────────────────────── */
+
+.intel-footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #2a2a2a;
+}
+
+.confidence-note {
+  font-size: 0.75rem;
+  color: #737373;
+  line-height: 1.4;
+  margin: 0 0 0.25rem 0;
+}
+
+.data-source {
+  font-size: 0.65rem;
+  color: #555;
+  margin: 0;
+}
+
+/* ── shared ────────────────────────────────────────────────────────── */
+
+.status-text { color: #a3a3a3; }
+.status-text.error { color: #ef4444; }
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #a3a3a3;
+}
+
+.empty-state h3 { color: #e5e5e5; margin-bottom: 0.5rem; }

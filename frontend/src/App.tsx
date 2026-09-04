@@ -1,6 +1,7 @@
 import { NavLink, Route, HashRouter as Router, Routes } from "react-router-dom";
 import { AttentionPage } from "./pages/AttentionPage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { IntelligencePage } from "./pages/IntelligencePage";
 import { WatchlistPage } from "./pages/WatchlistPage";
 import "./App.css";
 
@@ -20,6 +21,9 @@ function App() {
           <NavLink to="/history" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
             History
           </NavLink>
+          <NavLink to="/intelligence" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
+            Intelligence
+          </NavLink>
           <NavLink to="/watchlist" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
             Watchlist
           </NavLink>
@@ -29,6 +33,7 @@ function App() {
           <Routes>
             <Route path="/" element={<AttentionPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/intelligence" element={<IntelligencePage />} />
             <Route path="/watchlist" element={<WatchlistPage />} />
           </Routes>
         </main>
