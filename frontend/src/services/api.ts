@@ -1,3 +1,5 @@
+import type { AttentionResponse, ChangeBundle, Watchlist } from "../types/api";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
@@ -35,4 +37,20 @@ export interface HealthResponse {
 
 export const api = {
   health: () => request<HealthResponse>("/api/health"),
+
+  getWatchlist: () => request<Watchlist>("/api/watchlist"),
+  addStock: (symbol: string) =>
+    request<Watchlist>("/api/watchlist/stocks", {
+      method: "POST",
+      body: JSON.stringify({ symbol }),
+    }),
+  removeStock: (symbol: string) =>
+    request<Watchlist>(`/api/watchlist/stocks/${encodeURIComponent(symbol)}`, {
+      method: "DELETE",
+    }),
+
+  getAttention: () => request<AttentionResponse>("/api/attention"),
+  getChanges: () => request<ChangeBundle[]>("/api/changes"),
+  getChangeBundle: (symbol: string) => request<ChangeBundle>(`/api/changes/${encodeURIComponent(symbol)}`),
+  markSeen: (symbol: string) => request(`/api/stocks/${encodeURIComponent(symbol)}/seen`, { method: "POST" }),
 };

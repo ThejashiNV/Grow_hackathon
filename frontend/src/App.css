@@ -4,6 +4,12 @@
   padding: 2rem 1.5rem;
   font-family: system-ui, sans-serif;
   color: #e5e5e5;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+a.nav-item {
+  text-decoration: none;
 }
 
 .app-header h1 {

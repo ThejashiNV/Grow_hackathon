@@ -1,0 +1,51 @@
+.attention-summary {
+  margin-bottom: 1.25rem;
+}
+
+.attention-summary h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.3rem;
+}
+
+.attention-summary p {
+  color: #a3a3a3;
+  margin: 0;
+}
+
+.status-text {
+  color: #a3a3a3;
+}
+
+.status-text.error {
+  color: #ef4444;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #a3a3a3;
+}
+
+.empty-state h3 {
+  color: #e5e5e5;
+  margin-bottom: 0.5rem;
+}
+
+.collapsed-section {
+  margin-top: 1rem;
+}
+
+.collapsed-toggle {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px dashed #3a3a3a;
+  color: #a3a3a3;
+  border-radius: 8px;
+  padding: 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.collapsed-toggle:hover {
+  background: #222;
+}
