@@ -5,8 +5,10 @@ scoring into one story, instead of showing price/volume/news as unrelated
 numbers.
 """
 
+import logging
 from datetime import UTC, datetime
 
+from app.core.redis_client import get_redis
 from app.schemas.events import ClassifiedEvent
 from app.schemas.scoring import ChangeBundle, ExplainChip, ScoreComponents
 from app.services import scoring
@@ -14,12 +16,43 @@ from app.services.market_data import MarketDataProvider, get_market_data_provide
 from app.services.novelty_service import classify_and_dedupe
 from app.services.sector_service import get_sector_move
 
+logger = logging.getLogger(__name__)
+
 # A z-score-derived "normal daily move" band, expressed back in percent, for
 # the human-readable "Normal movement: +-X%" line on the card.
 Z_TO_NORMAL_BAND = 1.0
 
+# Recomputing on every request would be wasteful (Part 22/30) and would also
+# make the novelty/dedup step see the same headline twice within one user
+# session, silently marking it "already seen" before the user ever saw it.
+# A short cache keeps one computed bundle authoritative for a window of time
+# so /attention and /seen agree on what the user was actually shown.
+CACHE_TTL_SECONDS = 90
+
 
 async def build_change_bundle(symbol: str, provider: MarketDataProvider | None = None) -> ChangeBundle:
+    cache_key = f"change_bundle:{symbol}"
+    redis = get_redis()
+    if redis is not None:
+        try:
+            cached = await redis.get(cache_key)
+            if cached:
+                return ChangeBundle.model_validate_json(cached)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Redis read failed for %s: %s", cache_key, exc)
+
+    bundle = await _compute_change_bundle(symbol, provider)
+
+    if redis is not None:
+        try:
+            await redis.set(cache_key, bundle.model_dump_json(), ex=CACHE_TTL_SECONDS)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Redis write failed for %s: %s", cache_key, exc)
+
+    return bundle
+
+
+async def _compute_change_bundle(symbol: str, provider: MarketDataProvider | None = None) -> ChangeBundle:
     provider = provider or get_market_data_provider()
     now = datetime.now(UTC)
 

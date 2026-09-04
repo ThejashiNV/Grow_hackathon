@@ -4,9 +4,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.attention import router as attention_router
 from app.api.routes.changes import router as changes_router
 from app.api.routes.health import router as health_router
+from app.api.routes.state import router as state_router
 from app.api.routes.stocks import router as stocks_router
+from app.api.routes.watchlist import router as watchlist_router
 from app.core.chroma_client import connect_chroma
 from app.core.config import get_settings
 from app.core.database import close_mongo, connect_mongo
@@ -41,7 +44,10 @@ app.add_middleware(
 
 app.include_router(health_router, prefix="/api")
 app.include_router(stocks_router, prefix="/api")
+app.include_router(state_router, prefix="/api")
 app.include_router(changes_router, prefix="/api")
+app.include_router(watchlist_router, prefix="/api")
+app.include_router(attention_router, prefix="/api")
 
 
 @app.get("/")
