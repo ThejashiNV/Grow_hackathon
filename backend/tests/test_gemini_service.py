@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 
 import pytest
@@ -16,20 +17,33 @@ class FakeResponse:
     text: str | None
 
 
-class FakeModel:
+class FakeModels:
     def __init__(self, response_text: str | None = None, raise_exc: Exception | None = None, delay: float = 0):
         self._response_text = response_text
         self._raise_exc = raise_exc
         self._delay = delay
 
-    async def generate_content_async(self, prompt: str):
-        import asyncio
-
+    async def generate_content(self, model: str, contents: str):
         if self._delay:
             await asyncio.sleep(self._delay)
         if self._raise_exc:
             raise self._raise_exc
         return FakeResponse(text=self._response_text)
+
+
+class FakeAio:
+    def __init__(self, models: FakeModels):
+        self.models = models
+
+
+class FakeClient:
+    def __init__(self, api_key: str, models: FakeModels):
+        self.api_key = api_key
+        self.aio = FakeAio(models)
+
+
+def _patch_client(monkeypatch, models: FakeModels):
+    monkeypatch.setattr("google.genai.Client", lambda api_key: FakeClient(api_key, models))
 
 
 @pytest.mark.asyncio
@@ -42,11 +56,7 @@ async def test_missing_api_key_returns_none(monkeypatch):
 @pytest.mark.asyncio
 async def test_valid_response_returned(monkeypatch):
     monkeypatch.setattr(gemini_service, "get_settings", lambda: FakeSettings(gemini_api_key="fake-key"))
-    monkeypatch.setattr("google.generativeai.configure", lambda **kw: None)
-    monkeypatch.setattr(
-        "google.generativeai.GenerativeModel",
-        lambda model_name: FakeModel(response_text="RELIANCE moved unusually today."),
-    )
+    _patch_client(monkeypatch, FakeModels(response_text="RELIANCE moved unusually today."))
     result = await gemini_service.generate_explanation("some prompt")
     assert result == "RELIANCE moved unusually today."
 
@@ -54,8 +64,7 @@ async def test_valid_response_returned(monkeypatch):
 @pytest.mark.asyncio
 async def test_malformed_empty_response_falls_back(monkeypatch):
     monkeypatch.setattr(gemini_service, "get_settings", lambda: FakeSettings(gemini_api_key="fake-key"))
-    monkeypatch.setattr("google.generativeai.configure", lambda **kw: None)
-    monkeypatch.setattr("google.generativeai.GenerativeModel", lambda model_name: FakeModel(response_text=""))
+    _patch_client(monkeypatch, FakeModels(response_text=""))
     result = await gemini_service.generate_explanation("some prompt")
     assert result is None
 
@@ -63,8 +72,7 @@ async def test_malformed_empty_response_falls_back(monkeypatch):
 @pytest.mark.asyncio
 async def test_none_response_falls_back(monkeypatch):
     monkeypatch.setattr(gemini_service, "get_settings", lambda: FakeSettings(gemini_api_key="fake-key"))
-    monkeypatch.setattr("google.generativeai.configure", lambda **kw: None)
-    monkeypatch.setattr("google.generativeai.GenerativeModel", lambda model_name: FakeModel(response_text=None))
+    _patch_client(monkeypatch, FakeModels(response_text=None))
     result = await gemini_service.generate_explanation("some prompt")
     assert result is None
 
@@ -73,11 +81,7 @@ async def test_none_response_falls_back(monkeypatch):
 async def test_sdk_exception_falls_back_without_leaking_key(monkeypatch, caplog):
     secret_key = "super-secret-key-value"
     monkeypatch.setattr(gemini_service, "get_settings", lambda: FakeSettings(gemini_api_key=secret_key))
-    monkeypatch.setattr("google.generativeai.configure", lambda **kw: None)
-    monkeypatch.setattr(
-        "google.generativeai.GenerativeModel",
-        lambda model_name: FakeModel(raise_exc=RuntimeError(f"invalid request, key={secret_key}")),
-    )
+    _patch_client(monkeypatch, FakeModels(raise_exc=RuntimeError(f"invalid request, key={secret_key}")))
     with caplog.at_level("WARNING"):
         result = await gemini_service.generate_explanation("some prompt")
     assert result is None
@@ -88,10 +92,6 @@ async def test_sdk_exception_falls_back_without_leaking_key(monkeypatch, caplog)
 async def test_timeout_falls_back(monkeypatch):
     monkeypatch.setattr(gemini_service, "get_settings", lambda: FakeSettings(gemini_api_key="fake-key"))
     monkeypatch.setattr(gemini_service, "REQUEST_TIMEOUT_SECONDS", 0.01)
-    monkeypatch.setattr("google.generativeai.configure", lambda **kw: None)
-    monkeypatch.setattr(
-        "google.generativeai.GenerativeModel",
-        lambda model_name: FakeModel(response_text="too slow", delay=0.05),
-    )
+    _patch_client(monkeypatch, FakeModels(response_text="too slow", delay=0.05))
     result = await gemini_service.generate_explanation("some prompt")
     assert result is None

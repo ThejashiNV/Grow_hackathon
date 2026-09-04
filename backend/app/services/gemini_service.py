@@ -34,13 +34,12 @@ async def generate_explanation(prompt: str) -> str | None:
         return None
 
     try:
-        import google.generativeai as genai
+        from google import genai
 
-        genai.configure(api_key=settings.gemini_api_key)
-        model = genai.GenerativeModel(settings.gemini_model)
+        client = genai.Client(api_key=settings.gemini_api_key)
 
         response = await asyncio.wait_for(
-            model.generate_content_async(prompt),
+            client.aio.models.generate_content(model=settings.gemini_model, contents=prompt),
             timeout=REQUEST_TIMEOUT_SECONDS,
         )
 
