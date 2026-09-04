@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.session import get_current_user_id
-from app.repositories import stock_state_repository
+from app.repositories import history_repository, stock_state_repository
 from app.schemas.user_state import StockState
 from app.services.change_bundle_service import build_change_bundle
 
@@ -12,6 +12,7 @@ router = APIRouter(prefix="/stocks", tags=["state"])
 async def mark_seen(symbol: str, user_id: str = Depends(get_current_user_id)) -> StockState:
     symbol = symbol.upper()
     bundle = await build_change_bundle(symbol)
+    await history_repository.mark_seen(user_id, symbol)
     return await stock_state_repository.mark_seen(
         user_id=user_id,
         symbol=symbol,

@@ -9,6 +9,7 @@ from app.api.routes.attention import router as attention_router
 from app.api.routes.changes import router as changes_router
 from app.api.routes.demo import router as demo_router
 from app.api.routes.health import router as health_router
+from app.api.routes.history import router as history_router
 from app.api.routes.state import router as state_router
 from app.api.routes.stocks import router as stocks_router
 from app.api.routes.watchlist import router as watchlist_router
@@ -52,6 +53,7 @@ app.include_router(watchlist_router, prefix="/api")
 app.include_router(attention_router, prefix="/api")
 app.include_router(ask_router, prefix="/api")
 app.include_router(demo_router, prefix="/api")
+app.include_router(history_router, prefix="/api")
 
 
 @app.get("/")

@@ -6,7 +6,7 @@ import asyncio
 from datetime import UTC, datetime
 
 from app.core.config import get_settings
-from app.repositories import stock_state_repository, watchlist_repository
+from app.repositories import history_repository, stock_state_repository, watchlist_repository
 from app.schemas.attention import AttentionItem, AttentionResponse
 from app.schemas.scoring import ChangeBundle
 from app.services.change_bundle_service import build_change_bundle
@@ -64,6 +64,8 @@ async def build_attention_feed(user_id: str) -> AttentionResponse:
         for bundle in bundles
     ]
     items.sort(key=lambda item: item.bundle.attention_score, reverse=True)
+
+    await history_repository.record_meaningful_changes(user_id, bundles)
 
     meaningful_count = sum(1 for item in items if item.bundle.is_meaningful)
 

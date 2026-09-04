@@ -102,3 +102,28 @@ export interface AskResponse {
   confidence: number;
   llm_generated: boolean;
 }
+
+export interface HistoryEntry {
+  user_id: string;
+  symbol: string;
+  company_name: string | null;
+  date_key: string;
+  detected_at: string;
+  seen_at: string | null;
+  price: number | null;
+  change_pct: number | null;
+  attention_score: number;
+  surprise_score: number;
+  impact_score: number;
+  explain_chips: ExplainChip[];
+  top_headline: string | null;
+  top_event_type: string | null;
+  why_this: string;
+  why_now: string;
+  demo_label: string | null;
+}
+
+export interface HistoryResponse {
+  entries: HistoryEntry[];
+  total: number;
+}

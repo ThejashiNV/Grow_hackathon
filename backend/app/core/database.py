@@ -33,6 +33,8 @@ async def _ensure_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.change_events.create_index("event_id", unique=True)
     await db.change_bundles.create_index([("symbol", 1), ("timestamp", -1)])
     await db.market_snapshots.create_index("symbol", unique=True)
+    await db.change_history.create_index([("user_id", 1), ("symbol", 1), ("date_key", 1)], unique=True)
+    await db.change_history.create_index([("user_id", 1), ("detected_at", -1)])
 
 
 async def close_mongo() -> None:
