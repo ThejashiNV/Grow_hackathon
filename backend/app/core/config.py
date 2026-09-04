@@ -17,7 +17,10 @@ class Settings(BaseSettings):
     chroma_persist_directory: str = "./chroma_data"
 
     gemini_api_key: str = ""
-    llm_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3.8-flash"
+    """Current supported Flash-class model per ai.google.dev/gemini-api/docs/models
+    (checked live, Sept 2026). gemini-2.0-flash is deprecated/shut down -- do not
+    revert to it. Override via GEMINI_MODEL if Google ships a newer one."""
 
     market_data_provider: str = "yfinance"
 

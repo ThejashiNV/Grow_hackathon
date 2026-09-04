@@ -2,39 +2,46 @@
 
 The LLM is never given free rein: every prompt is built entirely from
 structured evidence already computed by the deterministic scoring pipeline
-(current state, prior user-seen state, score components, headlines, sector
-move, data freshness/confidence). It is explicitly instructed to use only
-that evidence, distinguish fact from interpretation, and say when evidence
-is insufficient rather than invent an explanation.
+(current state, prior user-seen state + diff, score components, headlines,
+sector move, data freshness/confidence). It is explicitly instructed to use
+only that evidence, distinguish fact from interpretation, and say when
+evidence is insufficient rather than invent an explanation.
 
 The product must not depend on the LLM being available (Part 31): with no
 GEMINI_API_KEY configured, `ask()` returns a deterministic evidence summary
 built from the same structured context instead of failing.
 """
 
-import logging
-import re
-
-from app.core.config import get_settings
+from app.repositories import stock_state_repository
 from app.schemas.rag import AskResponse
 from app.schemas.scoring import ChangeBundle
+from app.schemas.user_state import DiffResult, StockState
 from app.services.change_bundle_service import build_change_bundle
+from app.services.diff_engine import compute_diff
+from app.services.gemini_service import generate_explanation
 from app.utils.sector_map import SYMBOL_SECTOR
 
-logger = logging.getLogger(__name__)
+GROUNDING_INSTRUCTIONS = """You are explaining stock market signals for a watchlist app called Smart Watch.
+You are given STRUCTURED EVIDENCE below, produced by a deterministic scoring pipeline
+(not by you). Follow these rules strictly:
 
-GROUNDING_INSTRUCTIONS = """You are explaining stock market signals for a watchlist app. You are given
-STRUCTURED EVIDENCE below. Follow these rules strictly:
-
-- Only use the evidence supplied. Do not invent financial facts, prices, or news.
-- Do not claim a causal relationship (e.g. "the stock fell because of X") unless the
-  evidence directly supports it. Prefer "the move coincided with X" over "X caused the move"
-  unless the event is clearly the kind that would move price (e.g. a resignation, an earnings miss).
-- Clearly distinguish observed facts (price, volume, scores) from interpretation.
-- Mention data freshness/confidence when it's relevant to how much weight the answer deserves.
+- Use ONLY the evidence supplied. Do not invent financial facts, prices, news, or events.
+- Do not claim certainty about causation. Prefer "coincided with" / "the evidence suggests a
+  possible link" over "caused by", unless the event type is one that plausibly and directly moves
+  price (e.g. a resignation, an earnings miss, a regulatory action) -- and even then, say the
+  evidence "suggests" the link, since the system cannot confirm causation from headlines alone.
+- Clearly separate observed facts (price, volume, scores, diff vs last seen) from interpretation.
+- Mention data freshness/confidence when it materially affects how much weight the answer deserves.
 - If the evidence is insufficient to answer the question, say so explicitly rather than guessing.
-- Never present this as investment advice. Do not recommend buying or selling.
-- Keep the answer to 2-4 sentences, plain language, no markdown headers.
+- Never present this as investment advice. Do not recommend buying, selling, or holding.
+- Keep it concise: 3-5 short lines, plain language, no markdown headers, no bullet symbols other
+  than a plain dash if you list evidence. Do not repeat these instructions in your answer.
+
+Structure your answer as:
+1. What changed (one line, grounded in the price/volume/event evidence)
+2. Why it matters (impact/context -- sector-relative, novelty, or muted-reaction framing if relevant)
+3. Evidence (name the 1-2 strongest data points backing the above)
+4. Confidence / caveat (one line: how reliable is this, and what's missing if anything)
 """
 
 
@@ -48,7 +55,23 @@ def _extract_mentioned_symbols(question: str, primary: str) -> list[str]:
     return list(found)[:3]  # keep the context bounded
 
 
-def _format_evidence(bundle: ChangeBundle) -> str:
+def _format_diff(state: StockState, diff: DiffResult) -> str:
+    if not diff.has_prior_state:
+        return "This user has never seen this stock before -- there is no prior state to diff against."
+    lines = [f"Last seen by this user at {state.last_seen_at.isoformat() if state.last_seen_at else 'unknown'}:"]
+    lines.append(f"  last seen price: {state.last_seen_price}, last seen attention score: {state.last_seen_score}")
+    if diff.price_changed_since is not None:
+        lines.append(f"  price change since then: {diff.price_changed_since:+}%")
+    if diff.score_changed_since is not None:
+        lines.append(f"  attention score change since then: {diff.score_changed_since:+}")
+    if diff.new_event_ids:
+        lines.append(f"  {len(diff.new_event_ids)} new event(s) since the user last checked")
+    else:
+        lines.append("  no new events since the user last checked")
+    return "\n".join(lines)
+
+
+def _format_evidence(bundle: ChangeBundle, diff_text: str | None = None) -> str:
     lines = [f"=== {bundle.symbol} ({bundle.company_name or 'unknown company'}) ==="]
     if not bundle.data_ok:
         lines.append("Market data is currently unavailable for this symbol.")
@@ -80,10 +103,14 @@ def _format_evidence(bundle: ChangeBundle) -> str:
     else:
         lines.append("No relevant headlines found for this symbol right now.")
 
+    if diff_text:
+        lines.append("User's last-seen state / diff:")
+        lines.append(diff_text)
+
     return "\n".join(lines)
 
 
-def _fallback_answer(question: str, bundles: list[ChangeBundle]) -> str:
+def _fallback_answer(bundles: list[ChangeBundle]) -> str:
     primary = bundles[0]
     if not primary.data_ok:
         return "AI explanation is unavailable and market data for this symbol could not be loaded right now."
@@ -95,34 +122,26 @@ def _fallback_answer(question: str, bundles: list[ChangeBundle]) -> str:
     return " ".join(parts)
 
 
-async def _llm_answer(question: str, evidence_text: str) -> str | None:
-    settings = get_settings()
-    if not settings.gemini_api_key:
-        return None
-
-    try:
-        import google.generativeai as genai
-
-        genai.configure(api_key=settings.gemini_api_key)
-        model = genai.GenerativeModel(settings.llm_model)
-        prompt = f"{GROUNDING_INSTRUCTIONS}\n\nSTRUCTURED EVIDENCE:\n{evidence_text}\n\nQUESTION: {question}\n\nANSWER:"
-        response = await model.generate_content_async(prompt)
-        text = (response.text or "").strip()
-        return text or None
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Gemini call failed, falling back to evidence summary: %s", exc)
-        return None
-
-
-async def ask(symbol: str, question: str) -> AskResponse:
+async def ask(symbol: str, question: str, user_id: str | None = None) -> AskResponse:
     symbols = _extract_mentioned_symbols(question, symbol)
     bundles = [await build_change_bundle(s) for s in symbols]
     bundles = [b for b in bundles if b.symbol == symbol] + [b for b in bundles if b.symbol != symbol]
 
-    evidence_text = "\n\n".join(_format_evidence(b) for b in bundles)
-    evidence_list = [line for b in bundles for line in _format_evidence(b).split("\n")][:20]
+    primary_diff_text = None
+    if user_id and bundles[0].data_ok:
+        state = await stock_state_repository.get_state(user_id, symbol)
+        diff = compute_diff(state, bundles[0])
+        primary_diff_text = _format_diff(state, diff)
 
-    llm_text = await _llm_answer(question, evidence_text)
+    evidence_blocks = [
+        _format_evidence(b, primary_diff_text if b.symbol == symbol else None) for b in bundles
+    ]
+    evidence_text = "\n\n".join(evidence_blocks)
+    evidence_list = [line for block in evidence_blocks for line in block.split("\n")][:24]
+
+    prompt = f"{GROUNDING_INSTRUCTIONS}\n\nSTRUCTURED EVIDENCE:\n{evidence_text}\n\nQUESTION: {question}\n\nANSWER:"
+    llm_text = await generate_explanation(prompt)
+
     if llm_text:
         return AskResponse(
             answer=llm_text,
@@ -132,7 +151,7 @@ async def ask(symbol: str, question: str) -> AskResponse:
         )
 
     return AskResponse(
-        answer=_fallback_answer(question, bundles),
+        answer=_fallback_answer(bundles),
         evidence=evidence_list,
         confidence=bundles[0].confidence_score / 100.0,
         llm_generated=False,
