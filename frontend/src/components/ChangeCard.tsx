@@ -65,6 +65,7 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
           <span className="severity-emoji">{sev.emoji}</span>
           <span className="symbol">{bundle.company_name || bundle.symbol}</span>
           {diff.is_new_since_last_visit && <span className="badge-new">NEW</span>}
+          {bundle.demo_label && <span className="badge-demo">{bundle.demo_label}</span>}
         </div>
         <span className="sev-label">{sev.label}</span>
       </div>

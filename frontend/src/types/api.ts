@@ -53,6 +53,7 @@ export interface ChangeBundle {
   is_delayed: boolean;
   data_ok: boolean;
   confidence_factors: string[];
+  demo_label: string | null;
 }
 
 export interface DiffResult {
@@ -74,6 +75,14 @@ export interface AttentionResponse {
   meaningful_count: number;
   generated_at: string;
   empty_watchlist: boolean;
+  demo_mode: boolean;
+}
+
+export interface DemoScenario {
+  id: string;
+  title: string;
+  description: string;
+  symbol: string;
 }
 
 export interface WatchlistStock {

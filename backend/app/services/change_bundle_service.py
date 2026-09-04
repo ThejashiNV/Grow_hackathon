@@ -8,6 +8,7 @@ numbers.
 import logging
 from datetime import UTC, datetime
 
+from app.core.config import get_settings
 from app.core.redis_client import get_redis
 from app.schemas.events import ClassifiedEvent
 from app.schemas.scoring import ChangeBundle, ExplainChip, ScoreComponents
@@ -31,6 +32,13 @@ CACHE_TTL_SECONDS = 90
 
 
 async def build_change_bundle(symbol: str, provider: MarketDataProvider | None = None) -> ChangeBundle:
+    if get_settings().demo_mode:
+        from app.services.demo_data import get_demo_bundle
+
+        demo = get_demo_bundle(symbol)
+        if demo is not None:
+            return demo
+
     cache_key = f"change_bundle:{symbol}"
     redis = get_redis()
     if redis is not None:

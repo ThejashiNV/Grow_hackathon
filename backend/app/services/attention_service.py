@@ -5,6 +5,7 @@
 import asyncio
 from datetime import UTC, datetime
 
+from app.core.config import get_settings
 from app.repositories import stock_state_repository, watchlist_repository
 from app.schemas.attention import AttentionItem, AttentionResponse
 from app.schemas.scoring import ChangeBundle
@@ -39,8 +40,15 @@ def _apply_sector_wide_flags(bundles: list[ChangeBundle]) -> None:
 
 
 async def build_attention_feed(user_id: str) -> AttentionResponse:
-    watchlist = await watchlist_repository.get_watchlist(user_id)
-    symbols = [s.symbol for s in watchlist.stocks]
+    settings = get_settings()
+
+    if settings.demo_mode:
+        from app.services.demo_data import DEMO_SYMBOLS
+
+        symbols = list(DEMO_SYMBOLS)
+    else:
+        watchlist = await watchlist_repository.get_watchlist(user_id)
+        symbols = [s.symbol for s in watchlist.stocks]
 
     if not symbols:
         return AttentionResponse(items=[], meaningful_count=0, generated_at=datetime.now(UTC), empty_watchlist=True)
@@ -63,4 +71,5 @@ async def build_attention_feed(user_id: str) -> AttentionResponse:
         items=items,
         meaningful_count=meaningful_count,
         generated_at=datetime.now(UTC),
+        demo_mode=settings.demo_mode,
     )

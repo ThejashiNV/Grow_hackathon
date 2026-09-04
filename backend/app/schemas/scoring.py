@@ -60,3 +60,4 @@ class ChangeBundle(BaseModel):
     is_delayed: bool = True
     data_ok: bool = True
     confidence_factors: list[str] = []
+    demo_label: str | None = None

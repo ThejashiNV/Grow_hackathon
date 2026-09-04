@@ -17,3 +17,4 @@ class AttentionResponse(BaseModel):
     meaningful_count: int
     generated_at: datetime
     empty_watchlist: bool = False
+    demo_mode: bool = False

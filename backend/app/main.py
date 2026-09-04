@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.ask import router as ask_router
 from app.api.routes.attention import router as attention_router
 from app.api.routes.changes import router as changes_router
+from app.api.routes.demo import router as demo_router
 from app.api.routes.health import router as health_router
 from app.api.routes.state import router as state_router
 from app.api.routes.stocks import router as stocks_router
@@ -50,6 +51,7 @@ app.include_router(changes_router, prefix="/api")
 app.include_router(watchlist_router, prefix="/api")
 app.include_router(attention_router, prefix="/api")
 app.include_router(ask_router, prefix="/api")
+app.include_router(demo_router, prefix="/api")
 
 
 @app.get("/")

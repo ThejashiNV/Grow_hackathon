@@ -1,4 +1,4 @@
-import type { AskResponse, AttentionResponse, ChangeBundle, Watchlist } from "../types/api";
+import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, Watchlist } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -59,4 +59,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ symbol, question }),
     }),
+
+  getDemoScenarios: () =>
+    request<{ demo_mode: boolean; scenarios: DemoScenario[] }>("/api/demo/scenarios"),
 };
