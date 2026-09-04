@@ -86,3 +86,10 @@ export interface Watchlist {
   stocks: WatchlistStock[];
   updated_at: string;
 }
+
+export interface AskResponse {
+  answer: string;
+  evidence: string[];
+  confidence: number;
+  llm_generated: boolean;
+}

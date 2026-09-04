@@ -1,4 +1,4 @@
-import type { AttentionResponse, ChangeBundle, Watchlist } from "../types/api";
+import type { AskResponse, AttentionResponse, ChangeBundle, Watchlist } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -53,4 +53,10 @@ export const api = {
   getChanges: () => request<ChangeBundle[]>("/api/changes"),
   getChangeBundle: (symbol: string) => request<ChangeBundle>(`/api/changes/${encodeURIComponent(symbol)}`),
   markSeen: (symbol: string) => request(`/api/stocks/${encodeURIComponent(symbol)}/seen`, { method: "POST" }),
+
+  ask: (symbol: string, question: string) =>
+    request<AskResponse>("/api/ask", {
+      method: "POST",
+      body: JSON.stringify({ symbol, question }),
+    }),
 };

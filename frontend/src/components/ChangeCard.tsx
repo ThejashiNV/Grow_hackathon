@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AttentionItem } from "../types/api";
+import type { AskResponse, AttentionItem } from "../types/api";
 import { api } from "../services/api";
 import "./ChangeCard.css";
 
@@ -19,6 +19,9 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
   const { bundle, diff } = item;
   const [expanded, setExpanded] = useState(false);
   const [marking, setMarking] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [askResult, setAskResult] = useState<AskResponse | null>(null);
   const sev = severity(bundle.attention_score);
   const asOfTime = new Date(bundle.as_of).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
@@ -29,6 +32,18 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
       onSeen?.(bundle.symbol);
     } finally {
       setMarking(false);
+    }
+  };
+
+  const handleAsk = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+    setAsking(true);
+    try {
+      const result = await api.ask(bundle.symbol, question.trim());
+      setAskResult(result);
+    } finally {
+      setAsking(false);
     }
   };
 
@@ -136,6 +151,27 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          <form className="ask-why-form" onSubmit={handleAsk}>
+            <input
+              type="text"
+              placeholder="Ask why, e.g. 'Is this company-specific or sector-wide?'"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+            />
+            <button type="submit" disabled={asking || !question.trim()}>
+              {asking ? "..." : "Ask"}
+            </button>
+          </form>
+          {askResult && (
+            <div className="ask-answer">
+              <p>{askResult.answer}</p>
+              <span className="ask-meta">
+                {askResult.llm_generated ? "AI-generated" : "Evidence summary (no AI)"} · Confidence{" "}
+                {Math.round(askResult.confidence * 100)}%
+              </span>
             </div>
           )}
         </div>

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.ask import router as ask_router
 from app.api.routes.attention import router as attention_router
 from app.api.routes.changes import router as changes_router
 from app.api.routes.health import router as health_router
@@ -48,6 +49,7 @@ app.include_router(state_router, prefix="/api")
 app.include_router(changes_router, prefix="/api")
 app.include_router(watchlist_router, prefix="/api")
 app.include_router(attention_router, prefix="/api")
+app.include_router(ask_router, prefix="/api")
 
 
 @app.get("/")
