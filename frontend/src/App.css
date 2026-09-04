@@ -1,0 +1,62 @@
+.app-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, sans-serif;
+  color: #e5e5e5;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.tagline {
+  color: #a3a3a3;
+  margin-top: 0.25rem;
+}
+
+.app-nav {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.75rem;
+}
+
+.nav-item {
+  color: #a3a3a3;
+  cursor: pointer;
+}
+
+.nav-item.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.health-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.service-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.error {
+  color: #ef4444;
+}
