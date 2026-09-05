@@ -1,4 +1,4 @@
-import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, HistoryResponse, StockIntelligence, Watchlist } from "../types/api";
+import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, HistoryResponse, StockIntelligence, Watchlist, WatchlistIntelItem } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -70,4 +70,7 @@ export const api = {
     request<StockIntelligence>(
       `/api/intelligence/${encodeURIComponent(symbol)}${refresh ? "?refresh=true" : ""}`
     ),
+
+  getWatchlistIntelligence: () =>
+    request<{ items: WatchlistIntelItem[] }>("/api/intelligence-summary"),
 };

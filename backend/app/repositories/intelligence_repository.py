@@ -20,6 +20,9 @@ async def get_cached(symbol: str) -> StockIntelligence | None:
         if doc is None:
             return None
         cached_at = doc.get("cached_at")
+        if cached_at:
+            if cached_at.tzinfo is None:
+                cached_at = cached_at.replace(tzinfo=UTC)
         if cached_at and (datetime.now(UTC) - cached_at) > timedelta(hours=CACHE_TTL_HOURS):
             return None
         doc.pop("_id", None)

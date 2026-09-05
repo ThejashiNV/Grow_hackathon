@@ -36,6 +36,16 @@ async def _ensure_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.change_history.create_index([("user_id", 1), ("symbol", 1), ("date_key", 1)], unique=True)
     await db.change_history.create_index([("user_id", 1), ("detected_at", -1)])
     await db.market_intelligence.create_index("symbol", unique=True)
+    # Phase 2: persistent market data + news
+    await db.daily_prices.create_index([("symbol", 1), ("date", 1)], unique=True)
+    await db.daily_prices.create_index("symbol")
+    await db.price_history_meta.create_index("symbol", unique=True)
+    await db.benchmark_prices.create_index([("symbol", 1), ("date", 1)], unique=True)
+    await db.benchmark_meta.create_index("symbol", unique=True)
+    await db.company_profiles.create_index("symbol", unique=True)
+    await db.news_items.create_index("news_id", unique=True)
+    await db.news_items.create_index([("symbol", 1), ("published_at", -1)])
+    await db.news_cache_meta.create_index("symbol", unique=True)
 
 
 async def close_mongo() -> None:

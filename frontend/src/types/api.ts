@@ -145,6 +145,9 @@ export interface HorizonAnalysis {
   large_move_count: number;
   trend: string;
   momentum_score: number;
+  sector_return_pct: number | null;
+  market_return_pct: number | null;
+  relative_performance_pct: number | null;
 }
 
 export interface AnomalousMove {
@@ -160,6 +163,9 @@ export interface AnomalousMove {
   return_2w: number | null;
   return_1m: number | null;
   associated_event: string | null;
+  sector_return_pct: number | null;
+  market_return_pct: number | null;
+  abnormal_return_pct: number | null;
 }
 
 export interface PatternDiscovery {
@@ -169,6 +175,8 @@ export interface PatternDiscovery {
   observations: number;
   period_analyzed: string;
   details: Record<string, unknown> | null;
+  is_periodic: boolean;
+  evidence_strength: string;
 }
 
 export interface RegimeChange {
@@ -186,6 +194,8 @@ export interface RareEvent {
   description: string;
   recovery_days: number | null;
   severity: string;
+  event_type: string | null;
+  source: string | null;
 }
 
 export interface ExpectedVsActual {
@@ -194,22 +204,109 @@ export interface ExpectedVsActual {
   historical_observations: number;
   current_move: number | null;
   deviation: string;
+  historical_median: number | null;
+  historical_range_low: number | null;
+  historical_range_high: number | null;
+  similarity_score: number | null;
+}
+
+export interface AnomalySignal {
+  name: string;
+  score: number;
+  z_score: number;
+  description: string;
+}
+
+export interface MLAnomaly {
+  date: string;
+  composite_score: number;
+  is_anomalous: boolean;
+  explanation: string;
+  signals: AnomalySignal[];
+}
+
+export interface NewsItem {
+  news_id: string;
+  title: string;
+  summary: string;
+  publisher: string | null;
+  link: string | null;
+  published_at: string | null;
+  source: string;
+  event_type: string;
+  impact_score: number;
+}
+
+export interface BenchmarkComparison {
+  benchmark_name: string;
+  benchmark_symbol: string;
+  stock_return_pct: number;
+  benchmark_return_pct: number;
+  outperformance_pct: number;
+  correlation: number | null;
+  beta: number | null;
+}
+
+export interface CompanyProfile {
+  name: string;
+  sector: string | null;
+  industry: string | null;
+  exchange: string;
+  market_cap: number | null;
+  aliases: string[];
+  subsidiaries: string[];
+  segments: string[];
+  commodities: string[];
+  macro_factors: string[];
+  competitors: string[];
+}
+
+export interface DataFreshness {
+  price_data: string;
+  price_updated_at: string | null;
+  news_data: string;
+  news_updated_at: string | null;
+  benchmark_data: string;
+  intelligence_generated_at: string | null;
+  cache_hit: boolean;
+}
+
+export interface WatchlistIntelItem {
+  symbol: string;
+  company_name: string | null;
+  sector: string | null;
+  current_price: number | null;
+  change_pct: number | null;
+  status: string;
+  anomaly_score: number;
+  regime_alerts: string[];
+  news_count: number;
+  high_impact_news: number;
+  signals: string[];
+  freshness: DataFreshness | null;
 }
 
 export interface StockIntelligence {
   symbol: string;
   company_name: string | null;
   sector: string | null;
+  industry: string | null;
   data_start: string | null;
   data_end: string | null;
   total_trading_days: number;
   current_price: number | null;
+  change_pct: number | null;
+  company_profile: CompanyProfile | null;
+  freshness: DataFreshness | null;
   horizons: HorizonAnalysis[];
   anomalous_moves: AnomalousMove[];
   patterns: PatternDiscovery[];
   regime_changes: RegimeChange[];
   rare_events: RareEvent[];
   expected_vs_actual: ExpectedVsActual[];
+  ml_anomalies: MLAnomaly[];
+  news: NewsItem[];
+  benchmark_comparison: BenchmarkComparison[];
   generated_at: string;
   data_source: string;
   confidence_note: string;
