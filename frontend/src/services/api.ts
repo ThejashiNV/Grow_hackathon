@@ -1,4 +1,4 @@
-import type { AskResponse, AttentionResponse, ChangeBundle, DemoScenario, HistoryResponse, StockIntelligence, Watchlist, WatchlistIntelItem } from "../types/api";
+import type { AskResponse, AttentionResponse, ChangeBundle, DailyFeed, DemoScenario, HistoryResponse, RefreshStatus, StockIntelligence, Watchlist, WatchlistIntelItem } from "../types/api";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -73,4 +73,16 @@ export const api = {
 
   getWatchlistIntelligence: () =>
     request<{ items: WatchlistIntelItem[] }>("/api/intelligence-summary"),
+
+  getRefreshStatus: () =>
+    request<RefreshStatus>("/api/refresh-status"),
+
+  triggerRefresh: (symbol: string) =>
+    request<{ refreshed: boolean; symbol: string }>(`/api/refresh/${encodeURIComponent(symbol)}`, { method: "POST" }),
+
+  getDailyFeed: () =>
+    request<DailyFeed>("/api/daily-feed"),
+
+  markIntelSeen: () =>
+    request<{ marked: number; seen_at: string }>("/api/intel-seen", { method: "POST" }),
 };

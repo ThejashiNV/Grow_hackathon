@@ -271,6 +271,13 @@ export interface DataFreshness {
   cache_hit: boolean;
 }
 
+export interface IntelChange {
+  timestamp: string | null;
+  type: string;
+  detail: string;
+  severity: string;
+}
+
 export interface WatchlistIntelItem {
   symbol: string;
   company_name: string | null;
@@ -284,6 +291,65 @@ export interface WatchlistIntelItem {
   high_impact_news: number;
   signals: string[];
   freshness: DataFreshness | null;
+  changes_since_last_check: IntelChange[];
+  never_seen: boolean;
+  last_seen_at: string | null;
+  event_clusters: EventCluster[];
+}
+
+export interface ReactionWindow {
+  window: string;
+  days: number;
+  stock_return_pct: number;
+  market_return_pct: number | null;
+  abnormal_return_pct: number | null;
+  volume_ratio: number | null;
+}
+
+export interface HistoricalSimilar {
+  date: string;
+  event_description: string;
+  stock_return_5d_pct: number;
+  stock_return_20d_pct: number;
+  severity: string;
+}
+
+export interface EventImpact {
+  event_type: string;
+  event_date: string | null;
+  reactions: ReactionWindow[];
+  historical_avg_reaction_5d: number | null;
+  historical_avg_reaction_20d: number | null;
+  similar_events: HistoricalSimilar[];
+  historical_event_count: number;
+}
+
+export interface EventCluster {
+  cluster_id: string;
+  canonical_title: string;
+  event_type: string;
+  category: string;
+  article_count: number;
+  sources: string[];
+  first_seen: string | null;
+  last_seen: string | null;
+  impact_score: number;
+  severity: string;
+  affected_symbols: string[];
+  summary: string | null;
+  event_impact: EventImpact | null;
+}
+
+export interface StockBaseline {
+  normal_daily_vol_ann: number;
+  normal_volume_median: number;
+  normal_daily_range_pct: number;
+  normal_daily_range_p95: number;
+  volume_clustering_score: number;
+  return_persistence: number;
+  gap_frequency: number;
+  regime_label: string;
+  volatility_percentile: number;
 }
 
 export interface StockIntelligence {
@@ -305,9 +371,91 @@ export interface StockIntelligence {
   rare_events: RareEvent[];
   expected_vs_actual: ExpectedVsActual[];
   ml_anomalies: MLAnomaly[];
+  stock_baseline: StockBaseline | null;
   news: NewsItem[];
+  event_clusters: EventCluster[];
   benchmark_comparison: BenchmarkComparison[];
   generated_at: string;
   data_source: string;
   confidence_note: string;
+}
+
+// ── Refresh Pipeline ────────────────────────────────────────────────
+
+export interface RefreshStatus {
+  running: boolean;
+  last_run: string | null;
+  last_duration_sec: number | null;
+  stocks_tracked: number;
+  last_errors: string[];
+  total_refreshes: number;
+}
+
+// ── Daily Feed ──────────────────────────────────────────────────────
+
+export interface FeedAlert {
+  type: string;
+  symbol: string;
+  company_name: string | null;
+  score: number;
+  detail: string;
+  severity: string;
+}
+
+export interface FeedMover {
+  symbol: string;
+  company_name: string | null;
+  change_pct: number;
+  current_price: number | null;
+  anomaly_score: number;
+  direction: string;
+}
+
+export interface FeedNewsItem {
+  symbol: string;
+  title: string;
+  publisher: string | null;
+  published_at: string | null;
+  impact_score: number;
+  event_type: string;
+  link: string | null;
+}
+
+export interface SectorSummary {
+  stocks: { symbol: string; change_pct: number | null; anomaly_score: number }[];
+  avg_change_pct: number | null;
+  max_anomaly: number;
+}
+
+export interface RecentChange {
+  symbol: string;
+  timestamp: string | null;
+  type: string;
+  detail: string;
+  severity: string;
+}
+
+export interface FeedEventCluster {
+  symbol: string;
+  cluster_id: string;
+  canonical_title: string;
+  event_type: string;
+  category: string;
+  article_count: number;
+  impact_score: number;
+  severity: string;
+  affected_symbols: string[];
+  first_seen: string | null;
+  last_seen: string | null;
+}
+
+export interface DailyFeed {
+  alerts: FeedAlert[];
+  movers: FeedMover[];
+  news_digest: FeedNewsItem[];
+  event_clusters: FeedEventCluster[];
+  sector_summary: Record<string, SectorSummary>;
+  recent_changes: RecentChange[];
+  refresh_status: RefreshStatus | null;
+  generated_at: string | null;
 }

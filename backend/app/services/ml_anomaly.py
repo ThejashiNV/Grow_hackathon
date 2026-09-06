@@ -106,6 +106,16 @@ def detect_anomalies_ml(
         iso_signal = _isolation_forest_score(returns, vol_series, idx)
         signals.append(iso_signal)
 
+        # Signal 10: Change-point detection (CUSUM-like)
+        cp_signal = _change_point_signal(returns, idx)
+        if cp_signal.score > 10:
+            signals.append(cp_signal)
+
+        # Signal 11: Return-volume correlation break
+        corr_signal = _correlation_break(returns, vol_series, idx)
+        if corr_signal.score > 10:
+            signals.append(corr_signal)
+
         # Composite score: weighted average with emphasis on strongest signals
         composite = _compute_composite(signals)
 
@@ -450,3 +460,95 @@ def _build_explanation(signals: list[AnomalySignal], composite: float) -> str:
         header += " — MODERATE ANOMALY"
 
     return header + "\n" + "\n".join(parts)
+
+
+def _change_point_signal(returns: np.ndarray, idx: int) -> AnomalySignal:
+    """Detects regime shifts using a CUSUM-like statistic on returns."""
+    if idx < 60:
+        return AnomalySignal("change_point", 0, 0, "Insufficient history", 0.8)
+
+    pre = returns[max(0, idx - 40):idx - 10]
+    post = returns[max(0, idx - 10):idx + 1]
+
+    if len(pre) < 20 or len(post) < 5:
+        return AnomalySignal("change_point", 0, 0, "Insufficient data", 0.8)
+
+    pre_mean = float(np.mean(pre))
+    pre_std = float(np.std(pre))
+    post_mean = float(np.mean(post))
+
+    if pre_std < 1e-10:
+        return AnomalySignal("change_point", 0, 0, "Zero pre-period variance", 0.8)
+
+    shift = abs(post_mean - pre_mean) / pre_std
+
+    pre_vol = float(np.std(pre))
+    post_vol = float(np.std(post))
+    vol_shift = post_vol / max(pre_vol, 1e-10)
+
+    combined = shift + max(0, (vol_shift - 1.5)) * 2
+    score = min(100, max(0, combined * 20))
+
+    desc = f"Mean shift {shift:.1f}σ, volatility ratio {vol_shift:.1f}×"
+    if score > 40:
+        desc += " — potential regime change"
+
+    z = shift
+
+    return AnomalySignal("change_point", round(score, 1), round(z, 2), desc, 0.8)
+
+
+def _correlation_break(
+    returns: np.ndarray,
+    volumes: np.ndarray,
+    idx: int,
+) -> AnomalySignal:
+    """Detects breakdown in the return-volume correlation pattern."""
+    if idx < 60:
+        return AnomalySignal("correlation_break", 0, 0, "Insufficient history", 0.6)
+
+    baseline_start = max(0, idx - 252)
+    baseline_end = max(0, idx - 20)
+    recent_start = max(0, idx - 20)
+
+    bl_ret = returns[baseline_start:baseline_end]
+    bl_vol = volumes[baseline_start + 1:baseline_end + 1]
+    rc_ret = returns[recent_start:idx + 1]
+    rc_vol = volumes[recent_start + 1:idx + 2]
+
+    min_len = min(len(bl_ret), len(bl_vol))
+    if min_len < 30:
+        return AnomalySignal("correlation_break", 0, 0, "Insufficient baseline", 0.6)
+    bl_ret = bl_ret[:min_len]
+    bl_vol = bl_vol[:min_len]
+
+    min_recent = min(len(rc_ret), len(rc_vol))
+    if min_recent < 5:
+        return AnomalySignal("correlation_break", 0, 0, "Insufficient recent data", 0.6)
+    rc_ret = rc_ret[:min_recent]
+    rc_vol = rc_vol[:min_recent]
+
+    bl_corr = _pearson_corr(np.abs(bl_ret), bl_vol)
+    rc_corr = _pearson_corr(np.abs(rc_ret), rc_vol)
+
+    corr_change = abs(bl_corr - rc_corr)
+    score = min(80, max(0, (corr_change - 0.3) * 150))
+
+    desc = f"|Return|-volume correlation: baseline {bl_corr:.2f} → recent {rc_corr:.2f}"
+    if score > 30:
+        desc += " — correlation regime break"
+
+    z = corr_change / 0.2
+
+    return AnomalySignal("correlation_break", round(score, 1), round(z, 2), desc, 0.6)
+
+
+def _pearson_corr(x: np.ndarray, y: np.ndarray) -> float:
+    if len(x) < 5:
+        return 0.0
+    mx, my = np.mean(x), np.mean(y)
+    num = float(np.sum((x - mx) * (y - my)))
+    den = float(np.sqrt(np.sum((x - mx) ** 2) * np.sum((y - my) ** 2)))
+    if den < 1e-10:
+        return 0.0
+    return num / den

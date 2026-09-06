@@ -185,6 +185,9 @@ def detect_patterns(
     _detect_vol_clustering(returns, period_str, patterns)
     _detect_large_move_freq(returns, period_str, patterns)
     _detect_volume_patterns(volumes, period_str, patterns)
+    _detect_gap_and_reverse(closes, volumes, period_str, patterns)
+    _detect_momentum_exhaustion(closes, volumes, period_str, patterns)
+    _detect_volume_price_divergence(closes, volumes, period_str, patterns)
 
     return patterns
 
@@ -402,6 +405,174 @@ def _detect_volume_patterns(
             },
         )
     )
+
+
+def _detect_gap_and_reverse(
+    closes: np.ndarray,
+    volumes: np.ndarray,
+    period_str: str,
+    out: list[PatternDiscovery],
+) -> None:
+    """Detect gap-up-then-selloff or gap-down-then-rally sequences."""
+    if len(closes) < 120:
+        return
+    returns = np.diff(closes) / closes[:-1]
+    sigma = float(np.std(returns))
+    if sigma < 1e-10:
+        return
+    gap_thresh = 1.5 * sigma
+    gap_reverse_count = 0
+    gap_continue_count = 0
+
+    for i in range(1, len(returns) - 5):
+        if abs(returns[i]) < gap_thresh:
+            continue
+        fwd_5d = (closes[i + 6] / closes[i + 1] - 1) if i + 6 < len(closes) else 0
+        if returns[i] > 0 and fwd_5d < -sigma:
+            gap_reverse_count += 1
+        elif returns[i] < 0 and fwd_5d > sigma:
+            gap_reverse_count += 1
+        elif returns[i] > 0 and fwd_5d > sigma:
+            gap_continue_count += 1
+        elif returns[i] < 0 and fwd_5d < -sigma:
+            gap_continue_count += 1
+
+    total = gap_reverse_count + gap_continue_count
+    if total < 5:
+        return
+    reverse_pct = gap_reverse_count / total * 100
+    if reverse_pct > 55:
+        out.append(PatternDiscovery(
+            pattern_type="gap_and_reverse",
+            description=(
+                f"Large gaps tend to reverse within 5 days ({reverse_pct:.0f}% of "
+                f"{total} large-gap events)"
+            ),
+            confidence=min(1.0, total / 20),
+            observations=total,
+            period_analyzed=period_str,
+            details={"reverse_count": gap_reverse_count, "continue_count": gap_continue_count,
+                     "reverse_pct": round(reverse_pct, 1)},
+            is_periodic=False,
+            evidence_strength="moderate" if total >= 10 else "weak",
+        ))
+    elif reverse_pct < 40:
+        out.append(PatternDiscovery(
+            pattern_type="gap_and_continue",
+            description=(
+                f"Large gaps tend to continue in the same direction ({100 - reverse_pct:.0f}% of "
+                f"{total} large-gap events)"
+            ),
+            confidence=min(1.0, total / 20),
+            observations=total,
+            period_analyzed=period_str,
+            details={"reverse_count": gap_reverse_count, "continue_count": gap_continue_count,
+                     "continue_pct": round(100 - reverse_pct, 1)},
+            is_periodic=False,
+            evidence_strength="moderate" if total >= 10 else "weak",
+        ))
+
+
+def _detect_momentum_exhaustion(
+    closes: np.ndarray,
+    volumes: np.ndarray,
+    period_str: str,
+    out: list[PatternDiscovery],
+) -> None:
+    """Detect if extended rallies/selloffs tend to exhaust and reverse."""
+    if len(closes) < 120:
+        return
+    streak_lengths = []
+    streak_reversals = 0
+    returns = np.diff(closes) / closes[:-1]
+
+    i = 0
+    while i < len(returns) - 10:
+        sign = 1 if returns[i] > 0 else -1
+        streak = 1
+        while i + streak < len(returns) and (returns[i + streak] * sign > 0):
+            streak += 1
+        if streak >= 4:
+            streak_lengths.append(streak)
+            end_idx = i + streak
+            if end_idx + 3 < len(returns):
+                fwd_3d = float(np.sum(returns[end_idx:end_idx + 3]))
+                if fwd_3d * sign < 0:
+                    streak_reversals += 1
+        i += max(streak, 1)
+
+    if len(streak_lengths) < 5:
+        return
+    reversal_pct = streak_reversals / len(streak_lengths) * 100
+    avg_streak = float(np.mean(streak_lengths))
+
+    if reversal_pct > 60:
+        out.append(PatternDiscovery(
+            pattern_type="momentum_exhaustion",
+            description=(
+                f"Extended runs (4+ days same direction) reverse {reversal_pct:.0f}% of the time "
+                f"(avg streak: {avg_streak:.1f} days)"
+            ),
+            confidence=min(1.0, len(streak_lengths) / 15),
+            observations=len(streak_lengths),
+            period_analyzed=period_str,
+            details={"reversal_pct": round(reversal_pct, 1), "avg_streak_days": round(avg_streak, 1),
+                     "total_streaks": len(streak_lengths), "reversals": streak_reversals},
+            is_periodic=False,
+            evidence_strength="moderate" if len(streak_lengths) >= 10 else "weak",
+        ))
+
+
+def _detect_volume_price_divergence(
+    closes: np.ndarray,
+    volumes: np.ndarray,
+    period_str: str,
+    out: list[PatternDiscovery],
+) -> None:
+    """Detect if price trends on declining volume tend to reverse."""
+    if len(closes) < 120:
+        return
+    window = 20
+    divergence_count = 0
+    reversal_after_div = 0
+
+    for i in range(window, len(closes) - window, 5):
+        price_trend = closes[i] / closes[i - window] - 1
+        vol_recent = float(np.mean(volumes[i - window // 2:i]))
+        vol_prior = float(np.mean(volumes[i - window:i - window // 2]))
+        if vol_prior < 1:
+            continue
+
+        vol_trend = vol_recent / vol_prior - 1
+        is_divergence = (price_trend > 0.02 and vol_trend < -0.15) or \
+                        (price_trend < -0.02 and vol_trend < -0.15)
+
+        if is_divergence:
+            divergence_count += 1
+            if i + window < len(closes):
+                fwd_ret = closes[i + window] / closes[i] - 1
+                if (price_trend > 0 and fwd_ret < 0) or (price_trend < 0 and fwd_ret > 0):
+                    reversal_after_div += 1
+
+    if divergence_count < 4:
+        return
+    reversal_pct = reversal_after_div / divergence_count * 100
+
+    if reversal_pct > 50:
+        out.append(PatternDiscovery(
+            pattern_type="volume_price_divergence",
+            description=(
+                f"Price trends on declining volume reversed {reversal_pct:.0f}% of the time "
+                f"({divergence_count} divergence events)"
+            ),
+            confidence=min(1.0, divergence_count / 12),
+            observations=divergence_count,
+            period_analyzed=period_str,
+            details={"divergence_count": divergence_count, "reversal_count": reversal_after_div,
+                     "reversal_pct": round(reversal_pct, 1)},
+            is_periodic=False,
+            evidence_strength="moderate" if divergence_count >= 8 else "weak",
+        ))
 
 
 # ── Regime analysis ───────────────────────────────────────────────────

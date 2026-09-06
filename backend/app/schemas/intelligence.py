@@ -100,6 +100,49 @@ class MLAnomalyOut(BaseModel):
     signals: list[AnomalySignalOut] = []
 
 
+class ReactionWindowOut(BaseModel):
+    window: str
+    days: int
+    stock_return_pct: float
+    market_return_pct: float | None = None
+    abnormal_return_pct: float | None = None
+    volume_ratio: float | None = None
+
+
+class HistoricalSimilarOut(BaseModel):
+    date: str
+    event_description: str
+    stock_return_5d_pct: float
+    stock_return_20d_pct: float
+    severity: str
+
+
+class EventImpactOut(BaseModel):
+    event_type: str
+    event_date: str | None = None
+    reactions: list[ReactionWindowOut] = []
+    historical_avg_reaction_5d: float | None = None
+    historical_avg_reaction_20d: float | None = None
+    similar_events: list[HistoricalSimilarOut] = []
+    historical_event_count: int = 0
+
+
+class EventClusterOut(BaseModel):
+    cluster_id: str
+    canonical_title: str
+    event_type: str
+    category: str = "other"
+    article_count: int
+    sources: list[str] = []
+    first_seen: str | None = None
+    last_seen: str | None = None
+    impact_score: float = 0
+    severity: str = "low"
+    affected_symbols: list[str] = []
+    summary: str | None = None
+    event_impact: EventImpactOut | None = None
+
+
 class NewsItemOut(BaseModel):
     news_id: str
     title: str
@@ -136,6 +179,18 @@ class CompanyProfile(BaseModel):
     competitors: list[str] = []
 
 
+class StockBaselineOut(BaseModel):
+    normal_daily_vol_ann: float = 0
+    normal_volume_median: float = 0
+    normal_daily_range_pct: float = 0
+    normal_daily_range_p95: float = 0
+    volume_clustering_score: float = 0
+    return_persistence: float = 0
+    gap_frequency: float = 0
+    regime_label: str = "NORMAL"
+    volatility_percentile: float = 50
+
+
 class DataFreshness(BaseModel):
     price_data: str = "unknown"
     price_updated_at: str | None = None
@@ -168,7 +223,9 @@ class StockIntelligence(BaseModel):
     expected_vs_actual: list[ExpectedVsActual] = []
 
     ml_anomalies: list[MLAnomalyOut] = []
+    stock_baseline: StockBaselineOut | None = None
     news: list[NewsItemOut] = []
+    event_clusters: list[EventClusterOut] = []
     benchmark_comparison: list[BenchmarkComparison] = []
 
     generated_at: str = ""

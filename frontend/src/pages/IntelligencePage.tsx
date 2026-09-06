@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { api } from "../services/api";
 import type {
   AnomalousMove,
   BenchmarkComparison,
+  EventCluster,
   ExpectedVsActual,
   HorizonAnalysis,
   MLAnomaly,
@@ -10,6 +12,7 @@ import type {
   PatternDiscovery,
   RareEvent,
   RegimeChange,
+  StockBaseline,
   StockIntelligence,
   Watchlist,
 } from "../types/api";
@@ -422,6 +425,141 @@ function ExpectedSection({ items }: { items: ExpectedVsActual[] }) {
   );
 }
 
+function sevIcon(s: string) {
+  if (s === "critical") return "!!";
+  if (s === "high") return "!";
+  return "·";
+}
+
+function categoryColor(cat: string): string {
+  if (cat === "macro") return "var(--intel-amber)";
+  if (cat === "sector") return "var(--intel-cyan)";
+  if (cat === "commodity") return "#c084fc";
+  if (cat === "geopolitical") return "var(--intel-red)";
+  if (cat === "global") return "#60a5fa";
+  return "var(--intel-text-dim)";
+}
+
+function EventClustersSection({ clusters }: { clusters: EventCluster[] }) {
+  if (!clusters.length) return null;
+  return (
+    <section className="intel-section">
+      <div className="intel-section-header">
+        <h4>Event Intelligence</h4>
+        <span className="section-count">{clusters.length} clusters</span>
+      </div>
+      <div className="event-clusters-list">
+        {clusters.map((c) => (
+          <div key={c.cluster_id} className={`event-cluster-card sev-${c.severity}`}>
+            <div className="ec-header">
+              <span className={`ec-sev-badge badge-${c.severity}`}>
+                {sevIcon(c.severity)} {c.severity}
+              </span>
+              <span className="ec-type" style={{ color: categoryColor(c.category) }}>
+                {c.event_type.replace(/_/g, " ")}
+              </span>
+              <span className="ec-category">{c.category}</span>
+              <span className="ec-impact">Impact: {c.impact_score.toFixed(0)}</span>
+            </div>
+            <div className="ec-title">{c.canonical_title}</div>
+            <div className="ec-meta">
+              <span>{c.article_count} article{c.article_count > 1 ? "s" : ""}</span>
+              {c.sources.length > 0 && <span> · {c.sources.slice(0, 3).join(", ")}</span>}
+              {c.first_seen && <span> · {timeAgo(c.first_seen)}</span>}
+            </div>
+            {c.affected_symbols.length > 1 && (
+              <div className="ec-affected">
+                Also affects: {c.affected_symbols.filter((s) => s !== clusters[0]?.affected_symbols[0]).join(", ")}
+              </div>
+            )}
+            {c.event_impact && c.event_impact.reactions.length > 0 && (
+              <div className="ec-impact-detail">
+                <div className="ec-reactions">
+                  {c.event_impact.reactions.map((r) => (
+                    <div key={r.window} className="ec-reaction">
+                      <span className="ec-rw-label">{r.window}</span>
+                      <span className={`ec-rw-val ${r.stock_return_pct >= 0 ? "pos" : "neg"}`}>
+                        {r.stock_return_pct >= 0 ? "+" : ""}{r.stock_return_pct.toFixed(2)}%
+                      </span>
+                      {r.volume_ratio != null && (
+                        <span className="ec-rw-vol">{r.volume_ratio.toFixed(1)}x vol</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {c.event_impact.historical_event_count > 0 && (
+                  <div className="ec-hist-avg">
+                    Historical avg: {c.event_impact.historical_avg_reaction_5d != null
+                      ? `5d ${c.event_impact.historical_avg_reaction_5d >= 0 ? "+" : ""}${c.event_impact.historical_avg_reaction_5d.toFixed(2)}%`
+                      : ""}
+                    {c.event_impact.historical_avg_reaction_20d != null
+                      ? ` · 20d ${c.event_impact.historical_avg_reaction_20d >= 0 ? "+" : ""}${c.event_impact.historical_avg_reaction_20d.toFixed(2)}%`
+                      : ""}
+                    <span className="ec-hist-count"> ({c.event_impact.historical_event_count} similar)</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BaselineSection({ baseline }: { baseline: StockBaseline | null }) {
+  if (!baseline) return null;
+  const regimeColor = baseline.regime_label === "EXTREME" ? "var(--intel-red)"
+    : baseline.regime_label === "UNUSUAL" ? "var(--intel-amber)"
+    : baseline.regime_label === "ELEVATED" ? "var(--intel-cyan)"
+    : "var(--intel-green)";
+
+  return (
+    <section className="intel-section">
+      <div className="intel-section-header">
+        <h4>Stock Behavior Baseline</h4>
+        <span className="baseline-regime" style={{ color: regimeColor }}>
+          {baseline.regime_label}
+        </span>
+      </div>
+      <div className="baseline-grid">
+        <div className="baseline-metric">
+          <div className="bl-label">Ann. Volatility</div>
+          <div className="bl-value">{baseline.normal_daily_vol_ann.toFixed(1)}%</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Vol Percentile</div>
+          <div className="bl-value">{baseline.volatility_percentile.toFixed(0)}%</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Daily Range (med)</div>
+          <div className="bl-value">{baseline.normal_daily_range_pct.toFixed(2)}%</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Daily Range (p95)</div>
+          <div className="bl-value">{baseline.normal_daily_range_p95.toFixed(2)}%</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Vol Clustering</div>
+          <div className="bl-value">{baseline.volume_clustering_score.toFixed(2)}</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Return Momentum</div>
+          <div className="bl-value">{baseline.return_persistence.toFixed(3)}</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Gap Frequency</div>
+          <div className="bl-value">{(baseline.gap_frequency * 100).toFixed(1)}%</div>
+        </div>
+        <div className="baseline-metric">
+          <div className="bl-label">Median Volume</div>
+          <div className="bl-value">{fmtVol(baseline.normal_volume_median)}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CompanyContext({ data }: { data: StockIntelligence }) {
   const p = data.company_profile;
   if (!p) return null;
@@ -448,6 +586,7 @@ function CompanyContext({ data }: { data: StockIntelligence }) {
 // ── main page ────────────────────────────────────────────────────────
 
 export function IntelligencePage() {
+  const location = useLocation();
   const [input, setInput] = useState("");
   const [data, setData] = useState<StockIntelligence | null>(null);
   const [loading, setLoading] = useState(false);
@@ -457,6 +596,16 @@ export function IntelligencePage() {
   useEffect(() => {
     api.getWatchlist().then(setWatchlist).catch(() => {});
   }, []);
+
+  // Auto-load symbol from ?s= query param (e.g. from watchlist click)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const sym = params.get("s");
+    if (sym && sym !== data?.symbol) {
+      analyze(sym);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   const analyze = (raw: string, refresh = false) => {
     const s = raw.trim().toUpperCase();
@@ -551,6 +700,10 @@ export function IntelligencePage() {
           </div>
 
           {(data.ml_anomalies ?? []).length > 0 && <AnomalyHero anomalies={data.ml_anomalies} />}
+
+          {(data.event_clusters ?? []).length > 0 && <EventClustersSection clusters={data.event_clusters} />}
+
+          <BaselineSection baseline={data.stock_baseline ?? null} />
 
           {(data.news ?? []).length > 0 && <NewsSection news={data.news} />}
 

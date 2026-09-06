@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 
 class EventType(StrEnum):
+    # Company-specific
     EARNINGS = "earnings"
     EARNINGS_SURPRISE = "earnings_surprise"
     REVENUE_CHANGE = "revenue_change"
@@ -23,6 +24,21 @@ class EventType(StrEnum):
     ANALYST_ACTION = "analyst_action"
     PROMOTER_ACTIVITY = "promoter_activity"
     INSIDER_ACTIVITY = "insider_activity"
+    # Macro / Central bank
+    MACRO_RATE_CHANGE = "macro_rate_change"
+    MACRO_INFLATION = "macro_inflation"
+    MACRO_GDP = "macro_gdp"
+    MACRO_FISCAL = "macro_fiscal"
+    # Sector-wide
+    SECTOR_TREND = "sector_trend"
+    SECTOR_REGULATION = "sector_regulation"
+    # Commodity
+    COMMODITY_PRICE = "commodity_price"
+    # Geopolitical
+    GEOPOLITICAL = "geopolitical"
+    # Global markets
+    GLOBAL_MARKET = "global_market"
+    # Legacy catch-all
     MACRO_SECTOR_EVENT = "macro_sector_event"
     OTHER = "other"
 
@@ -38,5 +54,20 @@ class ClassifiedEvent(BaseModel):
     source: str | None = None
     link: str | None = None
     timestamp: datetime
-    # Set when this headline was semantically merged into an earlier event.
     is_duplicate_of: str | None = None
+
+
+class EventCluster(BaseModel):
+    cluster_id: str
+    canonical_title: str
+    event_type: EventType
+    article_count: int
+    sources: list[str]
+    first_seen: datetime
+    last_seen: datetime
+    impact_score: float
+    novelty_score: float
+    severity: str  # critical / high / medium / low
+    articles: list[ClassifiedEvent] = []
+    affected_symbols: list[str] = []
+    summary: str | None = None

@@ -25,10 +25,19 @@ from app.schemas.intelligence import (
     BenchmarkComparison,
     CompanyProfile,
     DataFreshness,
+    EventClusterOut,
+    EventImpactOut,
+    HistoricalSimilarOut,
     MLAnomalyOut,
     NewsItemOut,
+    ReactionWindowOut,
+    StockBaselineOut,
     StockIntelligence,
 )
+from app.services.event_classifier import EVENT_CATEGORY
+from app.services.event_clustering import cluster_events
+from app.services.event_impact import build_event_impact
+from app.services.event_stock_linker import enrich_clusters_with_stock_links
 from app.services.benchmark_service import (
     SECTOR_TO_INDEX,
     compute_relative_returns,
@@ -178,6 +187,70 @@ async def get_stock_intelligence(
             for n in news_items[:30]
         ]
 
+        try:
+            logger.info("Starting event clustering for %s with %d news items", symbol, len(news_items[:30]))
+            clusters, _ = await cluster_events(symbol, news_items[:30])
+            logger.info("Event clustering produced %d clusters for %s", len(clusters), symbol)
+            clusters = enrich_clusters_with_stock_links(clusters)
+
+            anomalous_dicts = [m.model_dump() for m in result.anomalous_moves]
+            rare_dicts = [r.model_dump() for r in result.rare_events]
+
+            cluster_outs: list[EventClusterOut] = []
+            for c in clusters:
+                event_date_str = c.first_seen.strftime("%Y-%m-%d") if c.first_seen else None
+                try:
+                    impact_result = build_event_impact(
+                        c.event_type, c.canonical_title, event_date_str,
+                        dates, closes, volumes, market_closes,
+                        anomalous_dicts, rare_dicts,
+                    )
+                    impact_out = EventImpactOut(
+                        event_type=impact_result.event_type,
+                        event_date=impact_result.event_date,
+                        reactions=[
+                            ReactionWindowOut(
+                                window=r.window, days=r.days,
+                                stock_return_pct=r.stock_return_pct,
+                                market_return_pct=r.market_return_pct,
+                                abnormal_return_pct=r.abnormal_return_pct,
+                                volume_ratio=r.volume_ratio,
+                            ) for r in impact_result.reactions
+                        ],
+                        historical_avg_reaction_5d=impact_result.historical_avg_reaction_5d,
+                        historical_avg_reaction_20d=impact_result.historical_avg_reaction_20d,
+                        similar_events=[
+                            HistoricalSimilarOut(
+                                date=s.date, event_description=s.event_description,
+                                stock_return_5d_pct=s.stock_return_5d_pct,
+                                stock_return_20d_pct=s.stock_return_20d_pct,
+                                severity=s.severity,
+                            ) for s in impact_result.similar_events
+                        ],
+                        historical_event_count=impact_result.historical_event_count,
+                    )
+                except Exception:
+                    impact_out = None
+
+                cluster_outs.append(EventClusterOut(
+                    cluster_id=c.cluster_id,
+                    canonical_title=c.canonical_title,
+                    event_type=c.event_type.value,
+                    category=EVENT_CATEGORY.get(c.event_type, "other"),
+                    article_count=c.article_count,
+                    sources=c.sources,
+                    first_seen=c.first_seen.isoformat() if c.first_seen else None,
+                    last_seen=c.last_seen.isoformat() if c.last_seen else None,
+                    impact_score=c.impact_score,
+                    severity=c.severity,
+                    affected_symbols=c.affected_symbols,
+                    summary=c.summary,
+                    event_impact=impact_out,
+                ))
+            result.event_clusters = cluster_outs
+        except Exception:
+            logger.warning("Event clustering failed for %s", symbol, exc_info=True)
+
     if market_closes is not None:
         rel = compute_relative_returns(closes, market_closes)
         if rel:
@@ -257,6 +330,22 @@ def _run_analysis(
 
     _enrich_anomalous_with_benchmarks(anomalous, dates, closes, sector_closes, market_closes)
 
+    from app.services.stock_baselines import compute_stock_baseline
+    baseline = compute_stock_baseline(symbol, closes, volumes)
+    baseline_out = None
+    if baseline:
+        baseline_out = StockBaselineOut(
+            normal_daily_vol_ann=baseline.normal_daily_vol_ann,
+            normal_volume_median=baseline.normal_volume_median,
+            normal_daily_range_pct=baseline.normal_daily_range_pct,
+            normal_daily_range_p95=baseline.normal_daily_range_p95,
+            volume_clustering_score=baseline.volume_clustering_score,
+            return_persistence=baseline.return_persistence,
+            gap_frequency=baseline.gap_frequency,
+            regime_label=baseline.regime_label,
+            volatility_percentile=baseline.volatility_percentile,
+        )
+
     n_years = len(closes) / 252
 
     return StockIntelligence(
@@ -271,6 +360,7 @@ def _run_analysis(
         rare_events=rare,
         expected_vs_actual=expected_actual,
         ml_anomalies=ml_anomalies_out,
+        stock_baseline=baseline_out,
         confidence_note=(
             f"Analysis based on {len(closes)} trading days ({n_years:.1f} years) "
             f"of historical data. Patterns are observational, not predictive. "

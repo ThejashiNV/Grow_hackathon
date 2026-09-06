@@ -18,6 +18,7 @@ from app.core.chroma_client import connect_chroma
 from app.core.config import get_settings
 from app.core.database import close_mongo, connect_mongo
 from app.core.redis_client import close_redis, connect_redis
+from app.services.refresh_pipeline import start_refresh_loop, stop_refresh_loop
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -28,8 +29,10 @@ async def lifespan(app: FastAPI):
     await connect_mongo()
     await connect_redis()
     connect_chroma()
+    await start_refresh_loop()
     logger.info("Startup complete")
     yield
+    await stop_refresh_loop()
     await close_mongo()
     await close_redis()
 
