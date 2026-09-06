@@ -1,4 +1,5 @@
 import { NavLink, Route, HashRouter as Router, Routes } from "react-router-dom";
+import { ParticleField } from "./components/ParticleField";
 import { AttentionPage } from "./pages/AttentionPage";
 import { DailyFeedPage } from "./pages/DailyFeedPage";
 import { HistoryPage } from "./pages/HistoryPage";
@@ -9,6 +10,7 @@ import "./App.css";
 function App() {
   return (
     <Router>
+      <ParticleField />
       <div className="app-shell">
         <header className="app-header">
           <h1>Smart Watch</h1>

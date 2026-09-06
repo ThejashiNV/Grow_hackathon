@@ -560,6 +560,259 @@ function BaselineSection({ baseline }: { baseline: StockBaseline | null }) {
   );
 }
 
+function BehaviorRadar({ data }: { data: StockIntelligence }) {
+  const axes = [
+    "Volatility",
+    "Momentum",
+    "Volume Activity",
+    "Anomaly Level",
+    "Event Density",
+    "Market Sensitivity",
+  ];
+
+  // Compute normalized values (0-100)
+  const volatility = data.stock_baseline
+    ? Math.min(100, (data.stock_baseline.normal_daily_vol_ann / 50) * 100)
+    : 0;
+
+  const momentum =
+    (data.horizons ?? []).length > 0
+      ? Math.abs(data.horizons[data.horizons.length - 1].momentum_score)
+      : 0;
+
+  const volumeActivity = data.stock_baseline
+    ? Math.min(100, data.stock_baseline.volume_clustering_score * 100)
+    : 0;
+
+  const anomalyLevel =
+    (data.ml_anomalies ?? []).length > 0
+      ? data.ml_anomalies[0].composite_score
+      : 0;
+
+  const eventDensity = Math.min(
+    100,
+    (((data.news ?? []).length + (data.event_clusters ?? []).length) / 20) * 100
+  );
+
+  const benchBeta =
+    (data.benchmark_comparison ?? []).length > 0 &&
+    data.benchmark_comparison[0].beta != null
+      ? data.benchmark_comparison[0].beta
+      : 1.0;
+  const marketSensitivity = Math.min(100, (benchBeta / 2) * 100);
+
+  const values = [
+    Math.max(10, volatility),
+    Math.max(10, momentum),
+    Math.max(10, volumeActivity),
+    Math.max(10, anomalyLevel),
+    Math.max(10, eventDensity),
+    Math.max(10, marketSensitivity),
+  ];
+
+  const cx = 125;
+  const cy = 125;
+  const maxR = 85;
+  const labelR = maxR + 20;
+  const n = axes.length;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;
+
+  const pointAt = (axis: number, fraction: number) => {
+    const angle = startAngle + axis * angleStep;
+    return {
+      x: cx + maxR * fraction * Math.cos(angle),
+      y: cy + maxR * fraction * Math.sin(angle),
+    };
+  };
+
+  const labelAt = (axis: number) => {
+    const angle = startAngle + axis * angleStep;
+    return {
+      x: cx + labelR * Math.cos(angle),
+      y: cy + labelR * Math.sin(angle),
+    };
+  };
+
+  const polyPoints = (fraction: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const p = pointAt(i, fraction);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+
+  const dataPoints = values
+    .map((v, i) => {
+      const p = pointAt(i, v / 100);
+      return `${p.x},${p.y}`;
+    })
+    .join(" ");
+
+  const guides = [0.25, 0.5, 0.75, 1.0];
+
+  return (
+    <section className="intel-section">
+      <div className="intel-section-header">
+        <h4>Behavior Signature</h4>
+      </div>
+      <div className="behavior-radar-wrap">
+        <svg viewBox="0 0 250 250" className="behavior-radar-svg">
+          {/* Concentric guide polygons */}
+          {guides.map((g) => (
+            <polygon
+              key={g}
+              points={polyPoints(g)}
+              fill="none"
+              stroke="#2a3340"
+              strokeWidth="1"
+            />
+          ))}
+          {/* Axis lines */}
+          {Array.from({ length: n }, (_, i) => {
+            const p = pointAt(i, 1);
+            return (
+              <line
+                key={i}
+                x1={cx}
+                y1={cy}
+                x2={p.x}
+                y2={p.y}
+                stroke="#2a3340"
+                strokeWidth="1"
+              />
+            );
+          })}
+          {/* Guide labels */}
+          {guides.map((g) => (
+            <text
+              key={`gl-${g}`}
+              x={cx + 2}
+              y={cy - maxR * g - 2}
+              fill="#3d4a5c"
+              fontSize="7"
+              fontFamily="'Inter', sans-serif"
+            >
+              {Math.round(g * 100)}
+            </text>
+          ))}
+          {/* Data polygon */}
+          <polygon
+            points={dataPoints}
+            fill="rgba(0,212,170,0.2)"
+            stroke="#00d4aa"
+            strokeWidth="2"
+          />
+          {/* Data vertices */}
+          {values.map((v, i) => {
+            const p = pointAt(i, v / 100);
+            return (
+              <circle
+                key={i}
+                cx={p.x}
+                cy={p.y}
+                r="3"
+                fill="#00d4aa"
+              />
+            );
+          })}
+          {/* Axis labels */}
+          {axes.map((label, i) => {
+            const lp = labelAt(i);
+            const angle = startAngle + i * angleStep;
+            const deg = (angle * 180) / Math.PI;
+            let anchor = "middle";
+            if (deg > -80 && deg < 80) anchor = "start";
+            else if (deg > 100 || deg < -100) anchor = "end";
+            return (
+              <text
+                key={label}
+                x={lp.x}
+                y={lp.y}
+                textAnchor={anchor}
+                dominantBaseline="central"
+                fill="#8b9ab0"
+                fontSize="9"
+                fontFamily="'Inter', sans-serif"
+              >
+                {label}
+              </text>
+            );
+          })}
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+function PriceSparkline({ moves }: { moves: AnomalousMove[] }) {
+  if (!moves.length) return null;
+
+  const sorted = [...moves].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  const dates = sorted.map((m) => new Date(m.date).getTime());
+  const prices = sorted.map((m) => m.close);
+
+  const minDate = Math.min(...dates);
+  const maxDate = Math.max(...dates);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  const padX = 8;
+  const padY = 10;
+  const w = 600;
+  const h = 100;
+  const plotW = w - padX * 2;
+  const plotH = h - padY * 2;
+  const dateRange = maxDate - minDate || 1;
+  const priceRange = maxPrice - minPrice || 1;
+
+  const toX = (d: number) => padX + ((d - minDate) / dateRange) * plotW;
+  const toY = (p: number) => padY + plotH - ((p - minPrice) / priceRange) * plotH;
+
+  const pathD = sorted
+    .map((m, i) => {
+      const x = toX(dates[i]);
+      const y = toY(m.close);
+      return `${i === 0 ? "M" : "L"}${x},${y}`;
+    })
+    .join(" ");
+
+  return (
+    <div className="price-sparkline-wrap">
+      <svg
+        width="100%"
+        height="120"
+        viewBox={`0 0 ${w} ${h}`}
+        preserveAspectRatio="none"
+        className="price-sparkline-svg"
+      >
+        <path d={pathD} fill="none" stroke="#00d4aa" strokeWidth="1.5" />
+        {sorted.map((m, i) => {
+          const x = toX(dates[i]);
+          const y = toY(m.close);
+          const r = Math.min(8, Math.max(3, m.magnitude_sigma * 1.5));
+          const color = m.direction === "down" ? "#e84057" : "#00c853";
+          return (
+            <circle
+              key={i}
+              cx={x}
+              cy={y}
+              r={r}
+              fill={color}
+              opacity="0.85"
+            >
+              <title>
+                {m.date}: {m.change_pct >= 0 ? "+" : ""}{m.change_pct.toFixed(2)}% ({m.magnitude_sigma.toFixed(1)}{"σ"})
+              </title>
+            </circle>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 function CompanyContext({ data }: { data: StockIntelligence }) {
   const p = data.company_profile;
   if (!p) return null;
@@ -697,9 +950,14 @@ export function IntelligencePage() {
               </span>
             </div>
             <CompanyContext data={data} />
+            {(data.anomalous_moves ?? []).length > 0 && (
+              <PriceSparkline moves={data.anomalous_moves} />
+            )}
           </div>
 
           {(data.ml_anomalies ?? []).length > 0 && <AnomalyHero anomalies={data.ml_anomalies} />}
+
+          <BehaviorRadar data={data} />
 
           {(data.event_clusters ?? []).length > 0 && <EventClustersSection clusters={data.event_clusters} />}
 
