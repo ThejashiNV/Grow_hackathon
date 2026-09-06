@@ -126,8 +126,8 @@
 
 .wl-add-form input {
   flex: 1;
-  background: var(--sw-surface, #0c1018);
-  border: 1px solid var(--sw-border, #161d2b);
+  background: var(--sw-surface, #0e1520);
+  border: 1px solid var(--sw-border, #1c2636);
   border-radius: 8px;
   padding: 0.55rem 0.85rem;
   color: var(--sw-text, #c9d1d9);
@@ -199,9 +199,9 @@
 /* ── Stock Card — Glass Panel with 3D hover ── */
 
 .wl-card {
-  background: linear-gradient(135deg, rgba(12,16,24,0.85) 0%, rgba(12,16,24,0.65) 100%);
+  background: linear-gradient(135deg, rgba(14,21,32,0.9) 0%, rgba(19,28,42,0.7) 100%);
   backdrop-filter: blur(8px);
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   border-radius: 10px;
   padding: 0.85rem 1rem;
   display: grid;
@@ -465,7 +465,7 @@
   font-size: 0.65rem;
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   background: transparent;
   color: var(--sw-muted, #4d5566);
   cursor: pointer;
@@ -498,7 +498,7 @@
 .wl-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--sw-border, #161d2b);
+  border: 2px solid var(--sw-border, #1c2636);
   border-top-color: var(--sw-accent, #00d4aa);
   border-radius: 50%;
   animation: wl-spin 0.7s linear infinite;

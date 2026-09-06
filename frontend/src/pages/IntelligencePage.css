@@ -5,11 +5,11 @@
 
 :root {
   --intel-bg: #080b10;
-  --intel-surface: #0f1318;
-  --intel-surface-2: #151a21;
-  --intel-surface-3: #1c222b;
-  --intel-border: #1e2530;
-  --intel-border-light: #2a3340;
+  --intel-surface: #0e1520;
+  --intel-surface-2: #131c2a;
+  --intel-surface-3: #1a2535;
+  --intel-border: #1c2636;
+  --intel-border-light: #2a3a4d;
   --intel-text: #c8cdd5;
   --intel-text-muted: #6b7a8d;
   --intel-text-dim: #3d4a5c;
@@ -328,8 +328,8 @@
 
 .intel-section {
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #111922 0%, #162030 100%);
-  border: 1px solid rgba(0,212,170,0.15);
+  background: linear-gradient(135deg, var(--intel-surface) 0%, var(--intel-surface-2) 100%);
+  border: 1px solid var(--intel-border-light);
   border-radius: 10px;
   padding: 1rem;
   position: relative;

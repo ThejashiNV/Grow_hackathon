@@ -24,8 +24,8 @@
 }
 
 .filter-btn {
-  background: var(--sw-surface, #0c1018);
-  border: 1px solid var(--sw-border, #161d2b);
+  background: var(--sw-surface, #0e1520);
+  border: 1px solid var(--sw-border, #1c2636);
   color: var(--sw-muted, #4d5566);
   border-radius: 6px;
   padding: 0.4rem 0.8rem;
@@ -83,7 +83,7 @@
   letter-spacing: 0.08em;
   color: var(--sw-muted, #4d5566);
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--sw-border, #161d2b);
+  border-bottom: 1px solid var(--sw-border, #1c2636);
   margin-bottom: 0.75rem;
   font-family: var(--sw-mono, monospace);
 }
@@ -115,7 +115,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--sw-border, #161d2b);
+  background: var(--sw-border, #1c2636);
   flex-shrink: 0;
 }
 
@@ -133,18 +133,18 @@
 .timeline-line {
   flex: 1;
   width: 2px;
-  background: var(--sw-border, #161d2b);
+  background: var(--sw-border, #1c2636);
   min-height: 20px;
 }
 
 .timeline-content {
   flex: 1;
-  background: linear-gradient(135deg, rgba(12,16,24,0.85) 0%, rgba(12,16,24,0.65) 100%);
+  background: linear-gradient(135deg, rgba(14,21,32,0.9) 0%, rgba(19,28,42,0.7) 100%);
   backdrop-filter: blur(8px);
   border-radius: 10px;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--sw-border, #161d2b);
-  border-left: 3px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
+  border-left: 3px solid var(--sw-border, #1c2636);
   margin-bottom: 0.25rem;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -257,7 +257,7 @@
   border-radius: 999px;
   background: rgba(22,29,43,0.5);
   color: var(--sw-text, #c9d1d9);
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   font-family: var(--sw-mono, monospace);
 }
 
@@ -291,7 +291,7 @@
 .timeline-details {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid var(--sw-border, #161d2b);
+  border-top: 1px solid var(--sw-border, #1c2636);
   font-size: 0.8rem;
   color: var(--sw-text, #c9d1d9);
   line-height: 1.45;
@@ -308,7 +308,7 @@
 .history-footer {
   text-align: center;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--sw-border, #161d2b);
+  border-top: 1px solid var(--sw-border, #1c2636);
   margin-top: 0.5rem;
 }
 

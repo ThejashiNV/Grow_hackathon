@@ -1,13 +1,13 @@
 /* ── Change Card — Glass Panel with 3D effects ── */
 
 .change-card {
-  background: linear-gradient(135deg, rgba(12,16,24,0.9) 0%, rgba(12,16,24,0.7) 100%);
+  background: linear-gradient(135deg, rgba(14,21,32,0.92) 0%, rgba(19,28,42,0.75) 100%);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  border-left: 4px solid var(--sw-border, #161d2b);
+  border-left: 4px solid var(--sw-border, #1c2636);
   margin-bottom: 0.75rem;
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -148,7 +148,7 @@
   border-radius: 999px;
   background: rgba(22,29,43,0.5);
   color: var(--sw-text, #c9d1d9);
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   font-family: var(--sw-mono, monospace);
 }
 
@@ -208,7 +208,7 @@
 .details {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--sw-border, #161d2b);
+  border-top: 1px solid var(--sw-border, #1c2636);
   font-size: 0.85rem;
   color: var(--sw-text, #c9d1d9);
   line-height: 1.5;
@@ -263,7 +263,7 @@
 .ask-why-form input {
   flex: 1;
   background: var(--sw-bg, #060910);
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   border-radius: 6px;
   padding: 0.45rem 0.65rem;
   color: var(--sw-text, #c9d1d9);
@@ -278,8 +278,8 @@
 }
 
 .ask-why-form button {
-  background: var(--sw-surface, #0c1018);
-  border: 1px solid var(--sw-border, #161d2b);
+  background: var(--sw-surface, #0e1520);
+  border: 1px solid var(--sw-border, #1c2636);
   color: var(--sw-text, #c9d1d9);
   border-radius: 6px;
   padding: 0.45rem 0.8rem;
@@ -304,7 +304,7 @@
   background: var(--sw-bg, #060910);
   border-radius: 8px;
   padding: 0.65rem 0.85rem;
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
 }
 
 .ask-answer p {
@@ -324,7 +324,7 @@
   align-items: center;
   margin-top: 0.75rem;
   padding-top: 0.5rem;
-  border-top: 1px solid var(--sw-border, #161d2b);
+  border-top: 1px solid var(--sw-border, #1c2636);
 }
 
 .as-of {
@@ -345,7 +345,7 @@
 
 .mark-seen {
   background: transparent;
-  border: 1px solid var(--sw-border, #161d2b);
+  border: 1px solid var(--sw-border, #1c2636);
   color: var(--sw-muted, #4d5566);
   border-radius: 6px;
   padding: 0.3rem 0.7rem;
