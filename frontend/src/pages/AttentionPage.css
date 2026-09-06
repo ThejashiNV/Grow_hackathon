@@ -1,3 +1,10 @@
+/* ── Attention Page ── */
+
+.attention-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
 .attention-summary {
   margin-bottom: 1.25rem;
 }
@@ -5,29 +12,37 @@
 .attention-summary h2 {
   margin: 0 0 0.25rem 0;
   font-size: 1.3rem;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
 }
 
 .attention-summary p {
-  color: #a3a3a3;
+  color: var(--sw-muted, #4d5566);
   margin: 0;
+  font-size: 0.9rem;
 }
 
 .status-text {
-  color: #a3a3a3;
+  color: var(--sw-muted, #4d5566);
+  font-family: var(--sw-mono, monospace);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 3rem;
 }
 
 .status-text.error {
-  color: #ef4444;
+  color: var(--sw-red, #ef4444);
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #a3a3a3;
+  color: var(--sw-muted, #4d5566);
 }
 
 .empty-state h3 {
-  color: #e5e5e5;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
   margin-bottom: 0.5rem;
 }
 
@@ -37,45 +52,75 @@
 
 .collapsed-toggle {
   width: 100%;
-  background: #1a1a1a;
-  border: 1px dashed #3a3a3a;
-  color: #a3a3a3;
+  background: var(--sw-surface, #0c1018);
+  border: 1px dashed var(--sw-border, #161d2b);
+  color: var(--sw-muted, #4d5566);
   border-radius: 8px;
   padding: 0.6rem;
   cursor: pointer;
   font-size: 0.85rem;
+  font-family: var(--sw-mono, monospace);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .collapsed-toggle:hover {
-  background: #222;
+  background: rgba(0,212,170,0.04);
+  border-color: rgba(0,212,170,0.2);
+  color: var(--sw-text, #c9d1d9);
 }
+
+/* ── Demo Banner with Animated Gradient ── */
 
 .demo-banner {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid #e94560;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, rgba(12,16,24,0.9) 0%, rgba(22,33,62,0.9) 100%);
+  border: 1px solid rgba(233,69,96,0.4);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
   margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(233,69,96,0.05), transparent);
+  animation: demo-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes demo-sweep {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(50%); }
 }
 
 .demo-badge {
-  background: #e94560;
+  background: linear-gradient(135deg, #e94560, #c23152);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  padding: 0.2rem 0.5rem;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.6rem;
   border-radius: 4px;
   white-space: nowrap;
+  font-family: var(--sw-mono, monospace);
+  box-shadow: 0 0 10px rgba(233,69,96,0.3);
 }
 
 .demo-subtitle {
-  color: #a3a3a3;
-  font-size: 0.85rem;
+  color: var(--sw-muted, #4d5566);
+  font-size: 0.82rem;
+  font-family: var(--sw-mono, monospace);
 }
+
+/* ── Scenario Selector ── */
 
 .scenario-selector {
   display: flex;
@@ -85,24 +130,27 @@
 }
 
 .scenario-btn {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: #a3a3a3;
+  background: var(--sw-surface, #0c1018);
+  border: 1px solid var(--sw-border, #161d2b);
+  color: var(--sw-muted, #4d5566);
   border-radius: 6px;
   padding: 0.4rem 0.8rem;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.15s ease;
+  font-size: 0.78rem;
+  font-family: var(--sw-mono, monospace);
+  transition: all 0.2s ease;
 }
 
 .scenario-btn:hover {
-  background: #222;
-  color: #e5e5e5;
+  background: rgba(0,212,170,0.04);
+  border-color: rgba(0,212,170,0.2);
+  color: var(--sw-text, #c9d1d9);
 }
 
 .scenario-btn.active {
-  background: #1a1a2e;
+  background: rgba(233,69,96,0.1);
   border-color: #e94560;
   color: #fff;
   font-weight: 600;
+  box-shadow: 0 0 8px rgba(233,69,96,0.15);
 }

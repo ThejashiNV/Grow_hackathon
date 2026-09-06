@@ -52,6 +52,12 @@ SYMBOL_SECTOR: dict[str, str] = {
     "HINDALCO.NS": "METALS",
     "ADANIENT.NS": "METALS",
     "ULTRACEMCO.NS": "METALS",
+    # Telecom
+    "BHARTIARTL.NS": "TELECOM",
+    # Infrastructure
+    "LT.NS": "INFRASTRUCTURE",
+    # Consumer
+    "TITAN.NS": "CONSUMER",
 }
 
 # NSE sector index tickers used to compute a sector-relative move.

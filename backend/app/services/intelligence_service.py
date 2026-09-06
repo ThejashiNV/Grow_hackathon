@@ -67,6 +67,11 @@ async def get_stock_intelligence(
     provider: MarketDataProvider | None = None,
     skip_cache: bool = False,
 ) -> StockIntelligence:
+    from app.core.config import get_settings
+    if get_settings().demo_mode:
+        from app.services.demo_intelligence import get_demo_intelligence
+        return get_demo_intelligence(symbol)
+
     if not skip_cache:
         cached = await intelligence_repository.get_cached(symbol)
         if cached is not None:

@@ -61,8 +61,15 @@ async def get_watchlist_intelligence_summary(
     user_id: str = Depends(get_current_user_id),
 ):
     """Compact intelligence summary for each watched stock, with changes since last check."""
-    watchlist = await watchlist_repository.get_watchlist(user_id)
-    symbols = [s.symbol for s in watchlist.stocks]
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if settings.demo_mode:
+        from app.services.demo_data import DEMO_SYMBOLS
+        symbols = list(DEMO_SYMBOLS)
+    else:
+        watchlist = await watchlist_repository.get_watchlist(user_id)
+        symbols = [s.symbol for s in watchlist.stocks]
 
     if not symbols:
         return {"items": [], "generated_at": None, "total_new_changes": 0}
@@ -177,8 +184,15 @@ async def trigger_refresh(symbol: str):
 @router.get("/daily-feed")
 async def daily_feed(user_id: str = Depends(get_current_user_id)):
     """Today's Market Intelligence daily feed — aggregated across all watchlist stocks."""
-    watchlist = await watchlist_repository.get_watchlist(user_id)
-    symbols = [s.symbol for s in watchlist.stocks]
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if settings.demo_mode:
+        from app.services.demo_data import DEMO_SYMBOLS
+        symbols = list(DEMO_SYMBOLS)
+    else:
+        watchlist = await watchlist_repository.get_watchlist(user_id)
+        symbols = [s.symbol for s in watchlist.stocks]
     if not symbols:
         return {"alerts": [], "movers": [], "news_digest": [], "sector_summary": {}, "refresh_status": None}
 

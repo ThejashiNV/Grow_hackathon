@@ -1,8 +1,8 @@
-/* ── Daily Feed / Today's Intelligence ─────────────────────────────── */
+/* ── Daily Feed / Today's Intelligence ── Glass Panel Theme ────────── */
 
 .daily-feed {
   --df-bg: #080b10;
-  --df-card: #0d1117;
+  --df-card: rgba(12,16,24,0.85);
   --df-border: #1b2230;
   --df-text: #c9d1d9;
   --df-muted: #6e7681;
@@ -14,7 +14,7 @@
   --df-blue: #3b82f6;
 
   color: var(--df-text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--sw-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   max-width: 1100px;
   margin: 0 auto;
   padding: 0.5rem;
@@ -31,21 +31,22 @@
 .df-header h2 {
   margin: 0;
   font-size: 1.2rem;
-  color: #f0f6fc;
+  color: var(--sw-text-bright, #f0f6fc);
   font-weight: 700;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-header .df-date {
   font-size: 0.8rem;
   color: var(--df-muted);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-pipeline {
   margin-left: auto;
   font-size: 0.7rem;
   color: var(--df-muted);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   display: flex;
   align-items: center;
   gap: 0.3rem;
@@ -56,6 +57,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--df-green);
+  box-shadow: 0 0 6px var(--df-green);
   animation: df-pulse 2s ease-in-out infinite;
 }
 
@@ -67,11 +69,17 @@
 /* ── What's New Since Last Check ── */
 
 .df-whats-new {
-  background: rgba(0,212,170,0.04);
-  border: 1px solid rgba(0,212,170,0.15);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0,212,170,0.06) 0%, rgba(0,212,170,0.02) 100%);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,212,170,0.2);
+  border-radius: 10px;
   padding: 0.75rem 1rem;
   margin-bottom: 1.25rem;
+  transition: border-color 0.3s;
+}
+
+.df-whats-new:hover {
+  border-color: rgba(0,212,170,0.35);
 }
 
 .df-whats-new-header {
@@ -94,8 +102,9 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--df-accent);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   line-height: 1;
+  text-shadow: 0 0 12px rgba(0,212,170,0.3);
 }
 
 .df-mark-seen-btn {
@@ -107,14 +116,15 @@
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .df-mark-seen-btn:hover {
   background: var(--df-accent);
   color: #080b10;
+  box-shadow: 0 0 12px rgba(0,212,170,0.2);
 }
 
 .df-mark-seen-btn:disabled {
@@ -137,8 +147,8 @@
 .df-whats-new-sym {
   font-weight: 700;
   font-size: 0.82rem;
-  color: #f0f6fc;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -146,12 +156,13 @@
 
 .df-new-tag {
   font-size: 0.55rem;
-  background: var(--df-accent);
+  background: linear-gradient(135deg, var(--df-accent), #00b89c);
   color: #080b10;
   padding: 0.08rem 0.3rem;
   border-radius: 2px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  box-shadow: 0 0 6px rgba(0,212,170,0.2);
 }
 
 .df-whats-new-change {
@@ -181,7 +192,7 @@
 .df-wnc-time {
   font-size: 0.62rem;
   color: var(--df-muted);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 /* ── Sections ── */
@@ -200,6 +211,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-section-title .count {
@@ -219,16 +231,24 @@
 
 .df-alert {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.6rem 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.df-alert:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .df-alert.critical {
   border-left: 3px solid var(--df-red);
+  box-shadow: inset 0 0 20px rgba(239,68,68,0.03);
 }
 
 .df-alert.high {
@@ -259,8 +279,8 @@
 .df-alert-sym {
   font-weight: 700;
   font-size: 0.85rem;
-  color: #f0f6fc;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-alert-name {
@@ -277,7 +297,7 @@
 .df-alert-score {
   font-weight: 700;
   font-size: 0.8rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   min-width: 36px;
   text-align: right;
 }
@@ -296,9 +316,16 @@
 
 .df-ec-card {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.55rem 0.7rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.df-ec-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .df-ec-card.critical { border-left: 3px solid var(--df-red); }
@@ -319,7 +346,7 @@
   letter-spacing: 0.5px;
   padding: 0.1rem 0.3rem;
   border-radius: 2px;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-ec-sev.critical { background: rgba(239,68,68,0.2); color: var(--df-red); }
@@ -345,13 +372,13 @@
   margin-left: auto;
   font-size: 0.75rem;
   font-weight: 700;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  color: var(--df-text);
+  font-family: var(--sw-mono, monospace);
+  color: var(--df-accent);
 }
 
 .df-ec-title {
   font-size: 0.8rem;
-  color: #f0f6fc;
+  color: var(--sw-text-bright, #f0f6fc);
   line-height: 1.3;
   margin-bottom: 0.2rem;
   overflow: hidden;
@@ -369,14 +396,14 @@
 .df-ec-sym {
   font-weight: 600;
   color: var(--df-accent);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-ec-affected {
   font-size: 0.62rem;
   color: var(--df-cyan);
   margin-top: 0.2rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 /* ── Movers ── */
@@ -389,23 +416,31 @@
 
 .df-mover {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.5rem 0.6rem;
   text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.df-mover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  border-color: rgba(0,212,170,0.2);
 }
 
 .df-mover-sym {
   font-weight: 700;
   font-size: 0.85rem;
-  color: #f0f6fc;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-mover-change {
   font-size: 1rem;
   font-weight: 700;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   margin: 0.15rem 0;
 }
 
@@ -415,7 +450,7 @@
 .df-mover-price {
   font-size: 0.7rem;
   color: var(--df-muted);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 /* ── News digest ── */
@@ -428,19 +463,25 @@
 
 .df-news-item {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.5rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.df-news-item:hover {
+  border-color: rgba(34,211,238,0.3);
 }
 
 .df-news-impact {
   flex-shrink: 0;
   font-size: 0.6rem;
   font-weight: 700;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   width: 30px;
   height: 22px;
   border-radius: 3px;
@@ -495,7 +536,7 @@
 
 .df-news-sym {
   font-weight: 600;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   color: var(--df-accent);
   font-size: 0.65rem;
 }
@@ -510,9 +551,16 @@
 
 .df-sector-card {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.5rem 0.6rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.df-sector-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,212,170,0.2);
 }
 
 .df-sector-name {
@@ -522,13 +570,14 @@
   color: var(--df-accent);
   font-weight: 600;
   margin-bottom: 0.3rem;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-sector-stats {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-sector-change.up { color: var(--df-green); }
@@ -580,18 +629,25 @@
 
 .df-change-item {
   background: var(--df-card);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--df-border);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.45rem 0.6rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.78rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.df-change-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,212,170,0.15);
 }
 
 .df-change-sym {
   font-weight: 600;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
   color: var(--df-accent);
   min-width: 50px;
 }
@@ -604,7 +660,7 @@
 .df-change-time {
   font-size: 0.65rem;
   color: var(--df-muted);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--sw-mono, monospace);
 }
 
 .df-change-sev {
@@ -614,6 +670,6 @@
   flex-shrink: 0;
 }
 
-.df-change-sev.high { background: var(--df-red); }
+.df-change-sev.high { background: var(--df-red); box-shadow: 0 0 4px var(--df-red); }
 .df-change-sev.medium { background: var(--df-amber); }
 .df-change-sev.low { background: var(--df-green); }
