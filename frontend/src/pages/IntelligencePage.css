@@ -324,6 +324,53 @@
   flex-shrink: 0;
 }
 
+/* ── quick stats bar ─────────────────────────────────────────────── */
+
+.intel-quick-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, var(--intel-surface) 0%, var(--intel-surface-2) 100%);
+  border: 1px solid var(--intel-border-light);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  flex-wrap: wrap;
+  animation: intel-section-enter 0.4s ease-out;
+}
+
+.iqs-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 52px;
+}
+
+.iqs-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--intel-heading);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+}
+
+.iqs-lbl {
+  font-size: 0.55rem;
+  color: var(--intel-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.iqs-sep {
+  width: 1px;
+  height: 28px;
+  background: var(--intel-border);
+  flex-shrink: 0;
+}
+
 /* ── sections ────────────────────────────────────────────────────── */
 
 .intel-section {
@@ -968,6 +1015,66 @@ a.news-title:hover { color: var(--intel-cyan); }
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+/* ── enhanced empty state ──────────────────────────────────────── */
+
+.intel-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  animation: intel-section-enter 0.5s ease-out;
+}
+
+.intel-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.intel-empty-state h3 {
+  color: var(--intel-heading);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.intel-empty-state p {
+  color: var(--intel-text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.intel-empty-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.intel-empty-features span {
+  font-size: 0.68rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--intel-surface);
+  border: 1px solid var(--intel-border);
+  color: var(--intel-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.intel-empty-features span:hover {
+  border-color: var(--intel-accent);
+  color: var(--intel-accent);
 }
 
 .empty-state {

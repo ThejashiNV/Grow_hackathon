@@ -49,6 +49,10 @@
   box-shadow: 0 0 8px rgba(0,212,170,0.15);
 }
 
+.filter-btn:active {
+  transform: scale(0.96);
+}
+
 .status-text {
   color: var(--sw-muted, #4d5566);
   font-family: var(--sw-mono, monospace);
@@ -94,6 +98,13 @@
   margin-bottom: 0.5rem;
   animation: tl-entry-enter 0.35s ease-out both;
 }
+
+.timeline-entry:nth-child(1) { animation-delay: 0.03s; }
+.timeline-entry:nth-child(2) { animation-delay: 0.06s; }
+.timeline-entry:nth-child(3) { animation-delay: 0.09s; }
+.timeline-entry:nth-child(4) { animation-delay: 0.12s; }
+.timeline-entry:nth-child(5) { animation-delay: 0.15s; }
+.timeline-entry:nth-child(n+6) { animation-delay: 0.18s; }
 
 @keyframes tl-entry-enter {
   from { opacity: 0; transform: translateX(-10px); }
@@ -294,6 +305,16 @@
   text-shadow: 0 0 8px rgba(0,212,170,0.3);
 }
 
+.timeline-expand .why-arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+  margin-right: 0.2rem;
+}
+
+.timeline-expand .why-arrow.open {
+  transform: rotate(90deg);
+}
+
 .timeline-details {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
@@ -301,6 +322,12 @@
   font-size: 0.8rem;
   color: var(--sw-text, #c9d1d9);
   line-height: 1.45;
+  animation: tl-details-slide 0.3s ease-out;
+}
+
+@keyframes tl-details-slide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .timeline-details p {
@@ -318,8 +345,30 @@
   margin-top: 0.5rem;
 }
 
+.history-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-footer-sep {
+  color: var(--sw-border, #1c2636);
+}
+
 .history-count {
   font-size: 0.75rem;
   color: var(--sw-muted, #4d5566);
   font-family: var(--sw-mono, monospace);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .timeline-dot-col { width: 36px; }
+  .timeline-time { font-size: 0.55rem; }
+  .timeline-symbol { font-size: 0.82rem; }
+  .timeline-scores { flex-wrap: wrap; gap: 0.5rem; }
+  .filter-btn { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
 }

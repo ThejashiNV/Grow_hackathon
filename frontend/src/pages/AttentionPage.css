@@ -211,3 +211,72 @@
   background: var(--sw-border, #1c2636);
   flex-shrink: 0;
 }
+
+/* ── Animated border on Market Pulse ── */
+
+.market-pulse {
+  position: relative;
+}
+
+.market-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 11px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0,212,170,0.2), rgba(34,211,238,0.08), rgba(167,139,250,0.12), rgba(0,212,170,0.08));
+  background-size: 300% 300%;
+  animation: mp-border-shift 8s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.market-pulse:hover::before {
+  opacity: 1;
+}
+
+@keyframes mp-border-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Scenario button tooltip ── */
+
+.scenario-btn {
+  position: relative;
+}
+
+.scenario-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14,21,32,0.95);
+  border: 1px solid var(--sw-border, #1c2636);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.65rem;
+  color: var(--sw-text, #c9d1d9);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* ── Collapsed section animation ── */
+
+.collapsed-section .change-card {
+  animation: card-enter 0.3s ease-out both;
+}
+
+.collapsed-section .change-card:nth-child(1) { animation-delay: 0.02s; }
+.collapsed-section .change-card:nth-child(2) { animation-delay: 0.04s; }
+.collapsed-section .change-card:nth-child(3) { animation-delay: 0.06s; }
+.collapsed-section .change-card:nth-child(n+4) { animation-delay: 0.08s; }

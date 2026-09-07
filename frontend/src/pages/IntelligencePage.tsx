@@ -1013,6 +1013,38 @@ export function IntelligencePage() {
             )}
           </div>
 
+          <div className="intel-quick-stats">
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.anomalous_moves ?? []).length}</span>
+              <span className="iqs-lbl">Anomalies</span>
+            </div>
+            <div className="iqs-sep" />
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.regime_changes ?? []).length}</span>
+              <span className="iqs-lbl">Regime Shifts</span>
+            </div>
+            <div className="iqs-sep" />
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.patterns ?? []).length}</span>
+              <span className="iqs-lbl">Patterns</span>
+            </div>
+            <div className="iqs-sep" />
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.event_clusters ?? []).length}</span>
+              <span className="iqs-lbl">Events</span>
+            </div>
+            <div className="iqs-sep" />
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.news ?? []).length}</span>
+              <span className="iqs-lbl">News</span>
+            </div>
+            <div className="iqs-sep" />
+            <div className="iqs-item">
+              <span className="iqs-val">{(data.horizons ?? []).length}</span>
+              <span className="iqs-lbl">Horizons</span>
+            </div>
+          </div>
+
           {(data.ml_anomalies ?? []).length > 0 && <AnomalyHero anomalies={data.ml_anomalies} />}
 
           <CompanyProfileCard data={data} />
@@ -1045,13 +1077,23 @@ export function IntelligencePage() {
       )}
 
       {!data && !loading && !error && (
-        <div className="empty-state">
+        <div className="intel-empty-state">
+          <div className="intel-empty-icon">📊</div>
           <h3>Select a stock to analyze</h3>
           <p>
-            Enter a symbol or select from your watchlist. The system will analyze multi-horizon
-            behavior, detect anomalies, gather live news, compare with benchmarks, discover patterns,
-            and identify regime changes.
+            Enter a symbol above or select from your watchlist. The system will run a
+            comprehensive analysis covering:
           </p>
+          <div className="intel-empty-features">
+            <span>Multi-Horizon Analysis</span>
+            <span>Anomaly Detection</span>
+            <span>Regime Changes</span>
+            <span>Pattern Discovery</span>
+            <span>News Intelligence</span>
+            <span>Benchmark Comparison</span>
+            <span>Behavior Signature</span>
+            <span>Event Clustering</span>
+          </div>
         </div>
       )}
     </div>

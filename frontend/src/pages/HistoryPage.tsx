@@ -94,6 +94,7 @@ function TimelineEntry({ entry }: { entry: HistoryEntry }) {
         )}
 
         <button className="timeline-expand" onClick={() => setExpanded((e) => !e)}>
+          <span className={`why-arrow ${expanded ? "open" : ""}`}>▸</span>
           {expanded ? "Hide details" : "Why?"}
         </button>
 
@@ -129,6 +130,26 @@ export function HistoryPage() {
     setFilter(f);
   };
 
+  if (loading) {
+    return (
+      <div className="history-page">
+        <div className="skeleton skeleton-line" style={{ height: 22, width: 200, marginBottom: 8 }} />
+        <div className="skeleton skeleton-line" style={{ height: 14, width: 340, marginBottom: 16 }} />
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="skeleton" style={{ width: 70, height: 32, borderRadius: 6 }} />
+          ))}
+        </div>
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} style={{ display: "flex", gap: 12, marginBottom: 10 }}>
+            <div className="skeleton" style={{ width: 50, height: 50, borderRadius: 8 }} />
+            <div className="skeleton skeleton-card" style={{ flex: 1, height: 100 }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="history-page">
       <div className="history-header">
@@ -147,8 +168,6 @@ export function HistoryPage() {
           </button>
         ))}
       </div>
-
-      {loading && <p className="status-text">Loading history...</p>}
       {error && <p className="status-text error">Could not load history: {error}</p>}
 
       {!loading && data && data.entries.length === 0 && (
@@ -177,7 +196,17 @@ export function HistoryPage() {
 
       {!loading && data && data.total > 0 && (
         <div className="history-footer">
-          <span className="history-count">{data.total} total entries recorded</span>
+          <span className="history-count">
+            {data.total} total {data.total === 1 ? "entry" : "entries"} recorded
+          </span>
+          <span className="history-footer-sep">&middot;</span>
+          <span className="history-count">
+            {data.entries.filter(e => e.attention_score >= 70).length} high alert
+          </span>
+          <span className="history-footer-sep">&middot;</span>
+          <span className="history-count">
+            {data.entries.filter(e => !e.seen_at).length} unseen
+          </span>
         </div>
       )}
     </div>

@@ -163,6 +163,34 @@ export function DailyFeedPage() {
         )}
       </div>
 
+      {/* Market Overview Stats */}
+      <div className="df-overview-bar">
+        <div className="df-ov-item">
+          <span className="df-ov-val">{feed.alerts.length}</span>
+          <span className="df-ov-label">Alerts</span>
+        </div>
+        <div className="df-ov-sep" />
+        <div className="df-ov-item">
+          <span className="df-ov-val">{(feed.event_clusters ?? []).length}</span>
+          <span className="df-ov-label">Clusters</span>
+        </div>
+        <div className="df-ov-sep" />
+        <div className="df-ov-item">
+          <span className="df-ov-val">{feed.movers.length}</span>
+          <span className="df-ov-label">Movers</span>
+        </div>
+        <div className="df-ov-sep" />
+        <div className="df-ov-item">
+          <span className="df-ov-val">{feed.news_digest.length}</span>
+          <span className="df-ov-label">News</span>
+        </div>
+        <div className="df-ov-sep" />
+        <div className="df-ov-item">
+          <span className="df-ov-val">{Object.keys(feed.sector_summary).length}</span>
+          <span className="df-ov-label">Sectors</span>
+        </div>
+      </div>
+
       {/* What Changed Since Last Check — top of page */}
       {totalNewChanges > 0 && (
         <div className="df-whats-new">
