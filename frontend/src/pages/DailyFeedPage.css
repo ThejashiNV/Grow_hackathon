@@ -512,6 +512,13 @@
 .df-mover-change.up { color: var(--df-green); }
 .df-mover-change.down { color: var(--df-red); }
 
+.df-mover-trend {
+  width: 36px;
+  height: 14px;
+  opacity: 0.6;
+  margin: 0.1rem 0;
+}
+
 .df-mover-price {
   font-size: 0.7rem;
   color: var(--df-muted);

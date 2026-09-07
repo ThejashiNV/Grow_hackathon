@@ -25,6 +25,26 @@ function timeAgo(iso: string | null | undefined): string {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
+function MiniTrend({ changePct }: { changePct: number | null }) {
+  if (changePct == null) return null;
+  const up = changePct >= 0;
+  const pts = up
+    ? "2,18 8,10 14,13 20,6 26,9 32,2"
+    : "2,2 8,9 14,6 20,13 26,10 32,18";
+  return (
+    <svg className="wl-mini-trend" viewBox="0 0 34 20" preserveAspectRatio="none">
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={up ? "var(--sw-green, #10b981)" : "var(--sw-red, #ef4444)"}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function changeSeverityIcon(type: string) {
   if (type === "anomaly_change") return "⚠";
   if (type === "regime_change") return "⇄";
@@ -348,6 +368,7 @@ export function WatchlistPage() {
                     {item.change_pct >= 0 ? "+" : ""}{item.change_pct.toFixed(2)}%
                   </span>
                 )}
+                <MiniTrend changePct={item.change_pct ?? null} />
                 <div className="wl-anomaly-ring">
                   <span className={`wl-ring ${ringClass(item.anomaly_score)}`}>
                     {Math.round(item.anomaly_score)}

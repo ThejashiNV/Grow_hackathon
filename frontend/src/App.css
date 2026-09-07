@@ -487,6 +487,19 @@ a.nav-item {
   background: var(--sw-muted);
 }
 
+/* ── Focus Ring ── */
+
+:focus-visible {
+  outline: 2px solid var(--sw-accent);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--sw-accent);
+  outline-offset: 1px;
+}
+
 /* ── Selection ── */
 
 ::selection {

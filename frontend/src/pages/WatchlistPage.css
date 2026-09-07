@@ -485,6 +485,12 @@
 .wl-change.up { color: var(--sw-green, #10b981); }
 .wl-change.down { color: var(--sw-red, #ef4444); }
 
+.wl-mini-trend {
+  width: 40px;
+  height: 16px;
+  opacity: 0.7;
+}
+
 .wl-anomaly-ring {
   display: flex;
   align-items: center;

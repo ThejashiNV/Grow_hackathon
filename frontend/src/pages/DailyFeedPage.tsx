@@ -51,6 +51,25 @@ function changeTypeIcon(type: string) {
   return "•";
 }
 
+function MoverTrend({ direction }: { direction: string }) {
+  const up = direction === "up";
+  const pts = up
+    ? "2,14 7,8 12,11 17,4 22,7 27,2"
+    : "2,2 7,7 12,4 17,11 22,8 27,14";
+  return (
+    <svg className="df-mover-trend" viewBox="0 0 29 16" preserveAspectRatio="none">
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={up ? "var(--df-green)" : "var(--df-red)"}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SymLink({ symbol }: { symbol: string }) {
   const nav = useNavigate();
   const clean = symbol.replace(".NS", "");
@@ -305,6 +324,7 @@ export function DailyFeedPage() {
                 <div className={`df-mover-change ${m.direction}`}>
                   {m.change_pct >= 0 ? "+" : ""}{m.change_pct.toFixed(2)}%
                 </div>
+                <MoverTrend direction={m.direction} />
                 {m.current_price != null && (
                   <div className="df-mover-price">
                     {"₹"}{m.current_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
