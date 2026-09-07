@@ -813,26 +813,78 @@ function PriceSparkline({ moves }: { moves: AnomalousMove[] }) {
   );
 }
 
-function CompanyContext({ data }: { data: StockIntelligence }) {
+function fmtMcap(v: number | null | undefined): string {
+  if (!v) return "—";
+  if (v >= 1e12) return `₹${(v / 1e12).toFixed(1)}T`;
+  if (v >= 1e9) return `₹${(v / 1e9).toFixed(1)}B`;
+  if (v >= 1e7) return `₹${(v / 1e7).toFixed(0)} Cr`;
+  return `₹${v.toLocaleString("en-IN")}`;
+}
+
+function CompanyProfileCard({ data }: { data: StockIntelligence }) {
   const p = data.company_profile;
   if (!p) return null;
   const segs = p.segments ?? [];
   const comms = p.commodities ?? [];
   const macros = p.macro_factors ?? [];
-  if (!segs.length && !comms.length && !macros.length) return null;
+  const competitors = p.competitors ?? [];
+  const subs = p.subsidiaries ?? [];
 
   return (
-    <div className="company-context">
-      {segs.slice(0, 5).map((s) => (
-        <span key={s} className="context-chip segment">{s}</span>
-      ))}
-      {comms.slice(0, 3).map((c) => (
-        <span key={c} className="context-chip commodity">{c}</span>
-      ))}
-      {macros.slice(0, 4).map((m) => (
-        <span key={m} className="context-chip macro">{m}</span>
-      ))}
-    </div>
+    <section className="intel-section company-profile-card">
+      <div className="intel-section-header">
+        <h4>Company Profile</h4>
+      </div>
+      <div className="cp-grid">
+        {p.market_cap != null && (
+          <div className="cp-stat">
+            <div className="cp-stat-label">Market Cap</div>
+            <div className="cp-stat-value">{fmtMcap(p.market_cap)}</div>
+          </div>
+        )}
+        {p.exchange && (
+          <div className="cp-stat">
+            <div className="cp-stat-label">Exchange</div>
+            <div className="cp-stat-value">{p.exchange}</div>
+          </div>
+        )}
+        {p.sector && (
+          <div className="cp-stat">
+            <div className="cp-stat-label">Sector</div>
+            <div className="cp-stat-value">{p.sector}</div>
+          </div>
+        )}
+        {p.industry && (
+          <div className="cp-stat">
+            <div className="cp-stat-label">Industry</div>
+            <div className="cp-stat-value">{p.industry}</div>
+          </div>
+        )}
+      </div>
+      <div className="cp-chips">
+        {segs.slice(0, 5).map((s) => (
+          <span key={s} className="context-chip segment">{s}</span>
+        ))}
+        {comms.slice(0, 3).map((c) => (
+          <span key={c} className="context-chip commodity">{c}</span>
+        ))}
+        {macros.slice(0, 4).map((m) => (
+          <span key={m} className="context-chip macro">{m}</span>
+        ))}
+      </div>
+      {competitors.length > 0 && (
+        <div className="cp-row">
+          <span className="cp-row-label">Competitors</span>
+          <span className="cp-row-value">{competitors.slice(0, 6).join(", ")}</span>
+        </div>
+      )}
+      {subs.length > 0 && (
+        <div className="cp-row">
+          <span className="cp-row-label">Key Subsidiaries</span>
+          <span className="cp-row-value">{subs.slice(0, 4).join(", ")}</span>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -949,13 +1001,14 @@ export function IntelligencePage() {
                 {data.total_trading_days} days ({data.data_start} → {data.data_end})
               </span>
             </div>
-            <CompanyContext data={data} />
             {(data.anomalous_moves ?? []).length > 0 && (
               <PriceSparkline moves={data.anomalous_moves} />
             )}
           </div>
 
           {(data.ml_anomalies ?? []).length > 0 && <AnomalyHero anomalies={data.ml_anomalies} />}
+
+          <CompanyProfileCard data={data} />
 
           <BehaviorRadar data={data} />
 

@@ -426,6 +426,57 @@ a.nav-item {
   color: var(--sw-text-bright);
 }
 
+/* ── Page Entry Animation ── */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-main > * {
+  animation: page-enter 0.35s ease-out;
+}
+
+/* ── Staggered Card Entry ── */
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wl-grid > .wl-card,
+.df-alerts > .df-alert,
+.df-movers > .df-mover,
+.df-heatmap > .df-heatmap-cell {
+  animation: card-enter 0.4s ease-out both;
+}
+
+.wl-grid > .wl-card:nth-child(1),
+.df-alerts > .df-alert:nth-child(1) { animation-delay: 0.03s; }
+.wl-grid > .wl-card:nth-child(2),
+.df-alerts > .df-alert:nth-child(2) { animation-delay: 0.06s; }
+.wl-grid > .wl-card:nth-child(3),
+.df-alerts > .df-alert:nth-child(3) { animation-delay: 0.09s; }
+.wl-grid > .wl-card:nth-child(4),
+.df-alerts > .df-alert:nth-child(4) { animation-delay: 0.12s; }
+.wl-grid > .wl-card:nth-child(5),
+.df-alerts > .df-alert:nth-child(5) { animation-delay: 0.15s; }
+.wl-grid > .wl-card:nth-child(6),
+.df-alerts > .df-alert:nth-child(6) { animation-delay: 0.18s; }
+.wl-grid > .wl-card:nth-child(n+7) { animation-delay: 0.21s; }
+
 /* ── Responsive ── */
 
 @media (max-width: 768px) {

@@ -819,11 +819,41 @@ a.news-title:hover { color: var(--intel-cyan); }
 
 /* ── company profile ─────────────────────────────────────────────── */
 
-.company-context {
+.company-profile-card .cp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.cp-stat {
+  background: var(--intel-surface);
+  border: 1px solid var(--intel-border);
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+}
+
+.cp-stat-label {
+  font-size: 0.6rem;
+  color: var(--intel-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.15rem;
+}
+
+.cp-stat-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--intel-text);
+}
+
+.cp-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
-  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .context-chip {
@@ -838,6 +868,27 @@ a.news-title:hover { color: var(--intel-cyan); }
 .context-chip.segment { color: var(--intel-cyan); }
 .context-chip.commodity { color: var(--intel-orange); }
 .context-chip.macro { color: var(--intel-purple); }
+
+.cp-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  padding: 0.3rem 0;
+  border-top: 1px solid var(--intel-border);
+}
+
+.cp-row-label {
+  color: var(--intel-text-dim);
+  min-width: 110px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.cp-row-value {
+  color: var(--intel-text-muted);
+}
 
 /* ── footer ──────────────────────────────────────────────────────── */
 

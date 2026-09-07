@@ -13,8 +13,8 @@ function App() {
       <ParticleField />
       <div className="app-shell">
         <header className="app-header">
-          <h1>Smart Watch</h1>
-          <p className="tagline">Private Market Intelligence Terminal</p>
+          <h1>GROW</h1>
+          <p className="tagline">Smart Market Intelligence Terminal</p>
           <div className="header-status">
             <span className="header-dot" />
             LIVE

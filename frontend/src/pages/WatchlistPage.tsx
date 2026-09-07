@@ -182,6 +182,51 @@ export function WatchlistPage() {
         </div>
       )}
 
+      {/* Portfolio Stats */}
+      {intelItems.length > 0 && (
+        <div className="wl-stats-bar">
+          <div className="wl-stat">
+            <span className="wl-stat-value">{intelItems.length}</span>
+            <span className="wl-stat-label">Stocks</span>
+          </div>
+          <div className="wl-stat">
+            <span className={`wl-stat-value ${(() => {
+              const changes = intelItems.filter(i => i.change_pct != null).map(i => i.change_pct!);
+              const avg = changes.length > 0 ? changes.reduce((a, b) => a + b, 0) / changes.length : 0;
+              return avg >= 0 ? "up" : "down";
+            })()}`}>
+              {(() => {
+                const changes = intelItems.filter(i => i.change_pct != null).map(i => i.change_pct!);
+                const avg = changes.length > 0 ? changes.reduce((a, b) => a + b, 0) / changes.length : 0;
+                return `${avg >= 0 ? "+" : ""}${avg.toFixed(2)}%`;
+              })()}
+            </span>
+            <span className="wl-stat-label">Avg Change</span>
+          </div>
+          <div className="wl-stat">
+            <span className={`wl-stat-value ${(() => {
+              const max = Math.max(...intelItems.map(i => i.anomaly_score));
+              return max >= 70 ? "alert" : max >= 40 ? "warn" : "";
+            })()}`}>
+              {Math.round(Math.max(...intelItems.map(i => i.anomaly_score)))}
+            </span>
+            <span className="wl-stat-label">Peak Anomaly</span>
+          </div>
+          <div className="wl-stat">
+            <span className="wl-stat-value">
+              {intelItems.filter(i => i.status === "high_anomaly" || i.status === "event_detected").length}
+            </span>
+            <span className="wl-stat-label">Active Signals</span>
+          </div>
+          <div className="wl-stat">
+            <span className="wl-stat-value">
+              {intelItems.reduce((sum, i) => sum + i.news_count, 0)}
+            </span>
+            <span className="wl-stat-label">News Items</span>
+          </div>
+        </div>
+      )}
+
       {/* Add stock */}
       <form className="wl-add-form" onSubmit={handleAdd}>
         <input

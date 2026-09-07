@@ -541,53 +541,87 @@
   font-size: 0.65rem;
 }
 
-/* ── Sector summary ── */
+/* ── Sector Heatmap ── */
 
-.df-sectors {
+.df-heatmap {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
 }
 
-.df-sector-card {
-  background: var(--df-card);
-  backdrop-filter: blur(8px);
+.df-heatmap-cell {
   border: 1px solid var(--df-border);
-  border-radius: 8px;
-  padding: 0.5rem 0.6rem;
-  transition: transform 0.2s, border-color 0.2s;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(8px);
 }
 
-.df-sector-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(0,212,170,0.2);
+.df-heatmap-cell:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
 }
 
-.df-sector-name {
-  font-size: 0.7rem;
+.df-hm-sector {
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--df-accent);
-  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  font-family: var(--sw-mono, monospace);
+}
+
+.df-hm-change {
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: var(--sw-mono, monospace);
   margin-bottom: 0.3rem;
-  font-family: var(--sw-mono, monospace);
 }
 
-.df-sector-stats {
+.df-hm-change.up { color: var(--df-green); }
+.df-hm-change.down { color: var(--df-red); }
+
+.df-hm-stocks {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.df-hm-stock {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.2);
   font-family: var(--sw-mono, monospace);
 }
 
-.df-sector-change.up { color: var(--df-green); }
-.df-sector-change.down { color: var(--df-red); }
+.df-hm-stock.up { color: var(--df-green); }
+.df-hm-stock.down { color: var(--df-red); }
 
-.df-sector-stocks {
-  font-size: 0.65rem;
+.df-hm-anomaly {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.5rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--sw-mono, monospace);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
   color: var(--df-muted);
-  margin-top: 0.2rem;
 }
+
+.df-hm-anom-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.df-hm-anom-dot.high { background: var(--df-red); box-shadow: 0 0 6px var(--df-red); }
+.df-hm-anom-dot.med { background: var(--df-amber); box-shadow: 0 0 4px var(--df-amber); }
+.df-hm-anom-dot.low { background: #eab308; }
 
 /* ── Loading ── */
 

@@ -294,27 +294,54 @@ export function DailyFeedPage() {
         </div>
       )}
 
-      {/* Sector Summary */}
+      {/* Sector Heatmap */}
       {hasSectors && (
         <div className="df-section">
-          <h3 className="df-section-title">Sector Overview</h3>
-          <div className="df-sectors">
-            {Object.entries(feed.sector_summary).map(([sector, data]) => (
-              <div key={sector} className="df-sector-card">
-                <div className="df-sector-name">{sector}</div>
-                <div className="df-sector-stats">
-                  {data.avg_change_pct != null && (
-                    <span className={`df-sector-change ${data.avg_change_pct >= 0 ? "up" : "down"}`}>
-                      {data.avg_change_pct >= 0 ? "+" : ""}{data.avg_change_pct.toFixed(2)}%
-                    </span>
+          <h3 className="df-section-title">Sector Heatmap</h3>
+          <div className="df-heatmap">
+            {Object.entries(feed.sector_summary).map(([sector, data]) => {
+              const change = data.avg_change_pct ?? 0;
+              const absChange = Math.abs(change);
+              const intensity = Math.min(1, absChange / 4);
+              const bg = change >= 0
+                ? `rgba(16,185,129,${0.08 + intensity * 0.35})`
+                : `rgba(239,68,68,${0.08 + intensity * 0.35})`;
+              const borderColor = change >= 0
+                ? `rgba(16,185,129,${0.2 + intensity * 0.4})`
+                : `rgba(239,68,68,${0.2 + intensity * 0.4})`;
+              const anomalyGlow = data.max_anomaly >= 60
+                ? "0 0 12px rgba(239,68,68,0.15)"
+                : "none";
+
+              return (
+                <div
+                  key={sector}
+                  className="df-heatmap-cell"
+                  style={{ background: bg, borderColor, boxShadow: anomalyGlow }}
+                >
+                  <div className="df-hm-sector">{sector}</div>
+                  <div className={`df-hm-change ${change >= 0 ? "up" : "down"}`}>
+                    {change >= 0 ? "+" : ""}{change.toFixed(2)}%
+                  </div>
+                  <div className="df-hm-stocks">
+                    {data.stocks.map(s => {
+                      const sc = s.change_pct ?? 0;
+                      return (
+                        <span key={s.symbol} className={`df-hm-stock ${sc >= 0 ? "up" : "down"}`}>
+                          {s.symbol.replace(".NS", "")} {sc >= 0 ? "+" : ""}{sc.toFixed(1)}%
+                        </span>
+                      );
+                    })}
+                  </div>
+                  {data.max_anomaly >= 40 && (
+                    <div className="df-hm-anomaly">
+                      <span className={`df-hm-anom-dot ${data.max_anomaly >= 70 ? "high" : data.max_anomaly >= 50 ? "med" : "low"}`} />
+                      {Math.round(data.max_anomaly)}
+                    </div>
                   )}
-                  <span>Anomaly: {data.max_anomaly}</span>
                 </div>
-                <div className="df-sector-stocks">
-                  {data.stocks.map(s => s.symbol.replace(".NS", "")).join(", ")}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

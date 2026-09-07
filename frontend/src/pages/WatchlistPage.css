@@ -116,6 +116,55 @@
   cursor: default;
 }
 
+/* ── Portfolio Stats Bar ── */
+
+.wl-stats-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  overflow-x: auto;
+}
+
+.wl-stat {
+  flex: 1;
+  min-width: 80px;
+  background: linear-gradient(135deg, rgba(14,21,32,0.9) 0%, rgba(19,28,42,0.7) 100%);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--sw-border, #1c2636);
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.wl-stat:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,212,170,0.2);
+}
+
+.wl-stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: var(--sw-mono, monospace);
+  color: var(--sw-text-bright, #f0f6fc);
+}
+
+.wl-stat-value.up { color: var(--sw-green, #10b981); }
+.wl-stat-value.down { color: var(--sw-red, #ef4444); }
+.wl-stat-value.alert { color: var(--sw-red, #ef4444); text-shadow: 0 0 8px rgba(239,68,68,0.3); }
+.wl-stat-value.warn { color: var(--sw-amber, #f59e0b); }
+
+.wl-stat-label {
+  display: block;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--sw-muted, #4d5566);
+  margin-top: 0.15rem;
+  font-family: var(--sw-mono, monospace);
+}
+
 /* ── Add Stock Form ── */
 
 .wl-add-form {
