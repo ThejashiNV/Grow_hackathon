@@ -15,6 +15,30 @@ function formatPct(n: number | null): string {
   return `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 }
 
+function ScoreRing({ value, label }: { value: number; label: string }) {
+  const r = 22;
+  const circ = 2 * Math.PI * r;
+  const pct = Math.min(100, Math.max(0, value));
+  const offset = circ - (pct / 100) * circ;
+  const color = pct >= 70 ? "#ef4444" : pct >= 50 ? "#f59e0b" : pct >= 35 ? "#eab308" : "#10b981";
+  return (
+    <div className="score-ring-wrap">
+      <svg className="score-ring-svg" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
+        <circle
+          cx="28" cy="28" r={r} fill="none"
+          stroke={color} strokeWidth="4" strokeLinecap="round"
+          strokeDasharray={circ} strokeDashoffset={offset}
+          transform="rotate(-90 28 28)"
+          className="score-ring-arc"
+        />
+      </svg>
+      <span className="score-ring-num">{Math.round(value)}</span>
+      <span className="score-ring-label">{label}</span>
+    </div>
+  );
+}
+
 export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (symbol: string) => void }) {
   const { bundle, diff } = item;
   const [expanded, setExpanded] = useState(false);
@@ -71,6 +95,7 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
       </div>
 
       <div className="score-row">
+        <ScoreRing value={bundle.attention_score} label="Attention" />
         <div className="score-box">
           <span className="score-label">Surprise</span>
           <span className="score-value">{bundle.surprise_score.toFixed(0)}</span>

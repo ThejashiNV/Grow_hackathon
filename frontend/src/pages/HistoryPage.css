@@ -92,6 +92,12 @@
   display: flex;
   gap: 0.75rem;
   margin-bottom: 0.5rem;
+  animation: tl-entry-enter 0.35s ease-out both;
+}
+
+@keyframes tl-entry-enter {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .timeline-dot-col {

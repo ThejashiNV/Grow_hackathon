@@ -199,6 +199,19 @@
 
 .df-section {
   margin-bottom: 1.25rem;
+  animation: df-section-enter 0.4s ease-out both;
+}
+
+.df-section:nth-child(1) { animation-delay: 0.05s; }
+.df-section:nth-child(2) { animation-delay: 0.1s; }
+.df-section:nth-child(3) { animation-delay: 0.15s; }
+.df-section:nth-child(4) { animation-delay: 0.2s; }
+.df-section:nth-child(5) { animation-delay: 0.25s; }
+.df-section:nth-child(n+6) { animation-delay: 0.3s; }
+
+@keyframes df-section-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .df-section-title {

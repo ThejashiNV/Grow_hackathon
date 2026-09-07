@@ -260,6 +260,29 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
   perspective: 600px;
+  animation: wl-card-enter 0.4s ease-out both;
+}
+
+.wl-card:nth-child(1) { animation-delay: 0s; }
+.wl-card:nth-child(2) { animation-delay: 0.04s; }
+.wl-card:nth-child(3) { animation-delay: 0.08s; }
+.wl-card:nth-child(4) { animation-delay: 0.12s; }
+.wl-card:nth-child(5) { animation-delay: 0.16s; }
+.wl-card:nth-child(6) { animation-delay: 0.2s; }
+.wl-card:nth-child(7) { animation-delay: 0.24s; }
+.wl-card:nth-child(8) { animation-delay: 0.28s; }
+.wl-card:nth-child(9) { animation-delay: 0.32s; }
+.wl-card:nth-child(n+10) { animation-delay: 0.36s; }
+
+@keyframes wl-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .wl-card:hover {
