@@ -154,3 +154,60 @@
   font-weight: 600;
   box-shadow: 0 0 8px rgba(233,69,96,0.15);
 }
+
+/* ── Market Pulse Widget ── */
+
+.market-pulse {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(14,21,32,0.85) 0%, rgba(19,28,42,0.7) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(28,38,54,0.8);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  flex-wrap: wrap;
+  transition: border-color 0.3s;
+}
+
+.market-pulse:hover {
+  border-color: rgba(0,212,170,0.2);
+}
+
+.mp-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 48px;
+}
+
+.mp-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
+  line-height: 1;
+}
+
+.mp-value.mp-meaningful { color: var(--sw-accent, #00d4aa); }
+.mp-value.mp-alert { color: var(--sw-red, #ef4444); text-shadow: 0 0 8px rgba(239,68,68,0.3); }
+.mp-value.mp-up { color: var(--sw-green, #10b981); }
+.mp-value.mp-down { color: var(--sw-red, #ef4444); }
+
+.mp-label {
+  font-size: 0.58rem;
+  color: var(--sw-muted, #4d5566);
+  font-family: var(--sw-mono, monospace);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mp-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--sw-border, #1c2636);
+  flex-shrink: 0;
+}

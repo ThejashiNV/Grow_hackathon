@@ -707,3 +707,19 @@
 .df-change-sev.high { background: var(--df-red); box-shadow: 0 0 4px var(--df-red); }
 .df-change-sev.medium { background: var(--df-amber); }
 .df-change-sev.low { background: var(--df-green); }
+
+/* ── Clickable stock symbol links ── */
+
+.df-sym-link {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--sw-text-bright, #f0f6fc);
+  font-family: var(--sw-mono, monospace);
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.df-sym-link:hover {
+  color: var(--df-accent);
+  text-shadow: 0 0 8px rgba(0,212,170,0.3);
+}

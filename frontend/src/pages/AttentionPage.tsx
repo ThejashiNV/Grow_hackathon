@@ -4,6 +4,49 @@ import type { AttentionResponse, DemoScenario } from "../types/api";
 import { ChangeCard } from "../components/ChangeCard";
 import "./AttentionPage.css";
 
+function MarketPulse({ data }: { data: AttentionResponse }) {
+  const items = data.items;
+  const total = items.length;
+  const meaningful = items.filter(i => i.bundle.is_meaningful).length;
+  const highAlert = items.filter(i => i.bundle.attention_score >= 70).length;
+  const avgScore = total > 0 ? items.reduce((s, i) => s + i.bundle.attention_score, 0) / total : 0;
+  const ups = items.filter(i => (i.bundle.change_pct ?? 0) > 0).length;
+  const downs = items.filter(i => (i.bundle.change_pct ?? 0) < 0).length;
+
+  return (
+    <div className="market-pulse">
+      <div className="mp-item">
+        <span className="mp-value">{total}</span>
+        <span className="mp-label">Tracked</span>
+      </div>
+      <div className="mp-divider" />
+      <div className="mp-item">
+        <span className="mp-value mp-meaningful">{meaningful}</span>
+        <span className="mp-label">Changed</span>
+      </div>
+      <div className="mp-divider" />
+      <div className="mp-item">
+        <span className={`mp-value ${highAlert > 0 ? "mp-alert" : ""}`}>{highAlert}</span>
+        <span className="mp-label">High Alert</span>
+      </div>
+      <div className="mp-divider" />
+      <div className="mp-item">
+        <span className="mp-value">{avgScore.toFixed(0)}</span>
+        <span className="mp-label">Avg Score</span>
+      </div>
+      <div className="mp-divider" />
+      <div className="mp-item">
+        <span className="mp-value mp-up">{ups}</span>
+        <span className="mp-label">Up</span>
+      </div>
+      <div className="mp-item">
+        <span className="mp-value mp-down">{downs}</span>
+        <span className="mp-label">Down</span>
+      </div>
+    </div>
+  );
+}
+
 export function AttentionPage() {
   const [data, setData] = useState<AttentionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +125,8 @@ export function AttentionPage() {
           ))}
         </div>
       )}
+
+      <MarketPulse data={data} />
 
       <div className="attention-summary">
         <h2>What needs your attention?</h2>

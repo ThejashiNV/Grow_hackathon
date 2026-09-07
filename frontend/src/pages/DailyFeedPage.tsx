@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import type { DailyFeed, WatchlistIntelItem } from "../types/api";
 import "./DailyFeedPage.css";
@@ -48,6 +49,19 @@ function changeTypeIcon(type: string) {
   if (type === "price_move") return "↕";
   if (type === "new_news") return "●";
   return "•";
+}
+
+function SymLink({ symbol }: { symbol: string }) {
+  const nav = useNavigate();
+  const clean = symbol.replace(".NS", "");
+  return (
+    <span
+      className="df-sym-link"
+      onClick={() => nav(`/intelligence?s=${symbol.includes(".") ? symbol : symbol + ".NS"}`)}
+    >
+      {clean}
+    </span>
+  );
 }
 
 export function DailyFeedPage() {
@@ -196,7 +210,7 @@ export function DailyFeedPage() {
                 <span className="df-alert-icon">{alertIcon(a.type)}</span>
                 <div className="df-alert-body">
                   <div className="df-alert-header">
-                    <span className="df-alert-sym">{a.symbol.replace(".NS", "")}</span>
+                    <SymLink symbol={a.symbol} />
                     {a.company_name && <span className="df-alert-name">{a.company_name}</span>}
                   </div>
                   <div className="df-alert-detail">{a.detail}</div>
@@ -251,7 +265,7 @@ export function DailyFeedPage() {
           <div className="df-movers">
             {feed.movers.map(m => (
               <div key={m.symbol} className="df-mover">
-                <div className="df-mover-sym">{m.symbol.replace(".NS", "")}</div>
+                <div className="df-mover-sym"><SymLink symbol={m.symbol} /></div>
                 <div className={`df-mover-change ${m.direction}`}>
                   {m.change_pct >= 0 ? "+" : ""}{m.change_pct.toFixed(2)}%
                 </div>
@@ -304,13 +318,13 @@ export function DailyFeedPage() {
               const absChange = Math.abs(change);
               const intensity = Math.min(1, absChange / 4);
               const bg = change >= 0
-                ? `rgba(16,185,129,${0.08 + intensity * 0.35})`
-                : `rgba(239,68,68,${0.08 + intensity * 0.35})`;
+                ? `rgba(16,185,129,${0.15 + intensity * 0.45})`
+                : `rgba(239,68,68,${0.15 + intensity * 0.45})`;
               const borderColor = change >= 0
-                ? `rgba(16,185,129,${0.2 + intensity * 0.4})`
-                : `rgba(239,68,68,${0.2 + intensity * 0.4})`;
+                ? `rgba(16,185,129,${0.35 + intensity * 0.45})`
+                : `rgba(239,68,68,${0.35 + intensity * 0.45})`;
               const anomalyGlow = data.max_anomaly >= 60
-                ? "0 0 12px rgba(239,68,68,0.15)"
+                ? "0 0 12px rgba(239,68,68,0.25)"
                 : "none";
 
               return (
