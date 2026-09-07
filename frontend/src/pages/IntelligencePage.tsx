@@ -975,6 +975,13 @@ export function IntelligencePage() {
           <p style={{ fontSize: "0.72rem", color: "var(--intel-text-dim)" }}>
             First analysis may take 10-20 seconds
           </p>
+          <div style={{ width: "100%", marginTop: "1.5rem" }}>
+            <div className="skeleton skeleton-line long" />
+            <div className="skeleton skeleton-line medium" />
+            {[1, 2, 3].map(i => (
+              <div key={i} className="skeleton skeleton-card" style={{ height: 100 }} />
+            ))}
+          </div>
         </div>
       )}
       {error && <p className="status-text error">{error}</p>}

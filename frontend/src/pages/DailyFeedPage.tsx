@@ -114,7 +114,15 @@ export function DailyFeedPage() {
   if (loading) {
     return (
       <div className="daily-feed">
-        <div className="df-loading"><div className="df-spinner" /> Loading today's intelligence...</div>
+        <div className="df-header">
+          <div className="skeleton skeleton-line short" style={{ height: 22 }} />
+          <div className="skeleton skeleton-line" style={{ width: 140, height: 14 }} />
+        </div>
+        <div className="skeleton skeleton-card" style={{ height: 80 }} />
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton skeleton-card" style={{ height: 56, marginTop: 8 }} />
+        ))}
+        <div className="skeleton skeleton-card" style={{ height: 120, marginTop: 16 }} />
       </div>
     );
   }

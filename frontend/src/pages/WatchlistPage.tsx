@@ -141,7 +141,18 @@ export function WatchlistPage() {
   if (loading) {
     return (
       <div className="watchlist-page">
-        <div className="wl-loading"><div className="wl-spinner" /> Loading intelligence...</div>
+        <div className="skeleton skeleton-line" style={{ height: 22, width: 200, marginBottom: 12 }} />
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="skeleton" style={{ flex: 1, height: 60, borderRadius: 8 }} />
+          ))}
+        </div>
+        <div className="skeleton skeleton-line long" style={{ height: 40, marginBottom: 12 }} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="skeleton skeleton-card" />
+          ))}
+        </div>
       </div>
     );
   }

@@ -1,8 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../services/api";
 import type { AttentionResponse, DemoScenario } from "../types/api";
 import { ChangeCard } from "../components/ChangeCard";
 import "./AttentionPage.css";
+
+function useCountUp(target: number, duration = 600) {
+  const [val, setVal] = useState(0);
+  const prev = useRef(0);
+  useEffect(() => {
+    const start = prev.current;
+    const diff = target - start;
+    if (diff === 0) return;
+    const t0 = performance.now();
+    let raf: number;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / duration);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(start + diff * ease));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else prev.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return val;
+}
 
 function MarketPulse({ data }: { data: AttentionResponse }) {
   const items = data.items;
@@ -13,34 +35,41 @@ function MarketPulse({ data }: { data: AttentionResponse }) {
   const ups = items.filter(i => (i.bundle.change_pct ?? 0) > 0).length;
   const downs = items.filter(i => (i.bundle.change_pct ?? 0) < 0).length;
 
+  const aTotal = useCountUp(total);
+  const aMeaningful = useCountUp(meaningful);
+  const aHighAlert = useCountUp(highAlert);
+  const aAvg = useCountUp(Math.round(avgScore));
+  const aUps = useCountUp(ups);
+  const aDowns = useCountUp(downs);
+
   return (
     <div className="market-pulse">
       <div className="mp-item">
-        <span className="mp-value">{total}</span>
+        <span className="mp-value">{aTotal}</span>
         <span className="mp-label">Tracked</span>
       </div>
       <div className="mp-divider" />
       <div className="mp-item">
-        <span className="mp-value mp-meaningful">{meaningful}</span>
+        <span className="mp-value mp-meaningful">{aMeaningful}</span>
         <span className="mp-label">Changed</span>
       </div>
       <div className="mp-divider" />
       <div className="mp-item">
-        <span className={`mp-value ${highAlert > 0 ? "mp-alert" : ""}`}>{highAlert}</span>
+        <span className={`mp-value ${highAlert > 0 ? "mp-alert" : ""}`}>{aHighAlert}</span>
         <span className="mp-label">High Alert</span>
       </div>
       <div className="mp-divider" />
       <div className="mp-item">
-        <span className="mp-value">{avgScore.toFixed(0)}</span>
+        <span className="mp-value">{aAvg}</span>
         <span className="mp-label">Avg Score</span>
       </div>
       <div className="mp-divider" />
       <div className="mp-item">
-        <span className="mp-value mp-up">{ups}</span>
+        <span className="mp-value mp-up">{aUps}</span>
         <span className="mp-label">Up</span>
       </div>
       <div className="mp-item">
-        <span className="mp-value mp-down">{downs}</span>
+        <span className="mp-value mp-down">{aDowns}</span>
         <span className="mp-label">Down</span>
       </div>
     </div>
@@ -72,7 +101,19 @@ export function AttentionPage() {
 
   useEffect(load, []);
 
-  if (loading) return <p className="status-text">Checking your watchlist...</p>;
+  if (loading) return (
+    <div className="attention-page">
+      <div className="skeleton skeleton-card" style={{ height: 60 }} />
+      <div className="skeleton skeleton-card" style={{ height: 44 }} />
+      <div style={{ marginTop: "1.25rem" }}>
+        <div className="skeleton skeleton-line long" />
+        <div className="skeleton skeleton-line medium" />
+      </div>
+      {[1, 2, 3].map(i => (
+        <div key={i} className="skeleton skeleton-card" style={{ height: 160, marginTop: 12 }} />
+      ))}
+    </div>
+  );
   if (error) return <p className="status-text error">Could not load attention feed: {error}</p>;
   if (!data) return null;
 
