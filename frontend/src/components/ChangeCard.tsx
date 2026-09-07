@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { AskResponse, AttentionItem } from "../types/api";
 import { api } from "../services/api";
 import "./ChangeCard.css";
@@ -41,6 +42,7 @@ function ScoreRing({ value, label }: { value: number; label: string }) {
 
 export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (symbol: string) => void }) {
   const { bundle, diff } = item;
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [marking, setMarking] = useState(false);
   const [question, setQuestion] = useState("");
@@ -87,7 +89,12 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
       <div className="card-header">
         <div className="title-row">
           <span className="severity-emoji">{sev.emoji}</span>
-          <span className="symbol">{bundle.company_name || bundle.symbol}</span>
+          <span
+            className="symbol symbol-link"
+            onClick={() => navigate(`/intelligence?s=${bundle.symbol}`)}
+          >
+            {bundle.company_name || bundle.symbol}
+          </span>
           {diff.is_new_since_last_visit && <span className="badge-new">NEW</span>}
           {bundle.demo_label && <span className="badge-demo">{bundle.demo_label}</span>}
         </div>
@@ -135,7 +142,8 @@ export function ChangeCard({ item, onSeen }: { item: AttentionItem; onSeen?: (sy
         <div className="since-last-visit">Since your last visit: {formatPct(diff.price_changed_since)}</div>
       )}
 
-      <button className="why-toggle" onClick={() => setExpanded((e) => !e)}>
+      <button className="why-toggle" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded}>
+        <span className={`why-arrow ${expanded ? "open" : ""}`}>▸</span>
         {expanded ? "Hide details" : "Why?"}
       </button>
 

@@ -73,6 +73,16 @@
   font-family: var(--sw-mono, monospace);
 }
 
+.symbol-link {
+  cursor: pointer;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.symbol-link:hover {
+  color: var(--sw-accent, #00d4aa);
+  text-shadow: 0 0 8px rgba(0,212,170,0.3);
+}
+
 .badge-new {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
@@ -98,8 +108,10 @@
 
 .score-row {
   display: flex;
+  align-items: center;
   gap: 1.5rem;
   margin: 0.5rem 0;
+  flex-wrap: wrap;
 }
 
 .score-box {
@@ -466,14 +478,14 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* ── Why toggle pulse ── */
+/* ── Why toggle arrow ── */
 
-.why-toggle::before {
-  content: "▸ ";
-  transition: transform 0.2s;
+.why-arrow {
   display: inline-block;
+  transition: transform 0.25s ease;
+  margin-right: 0.2rem;
 }
 
-.why-toggle[aria-expanded="true"]::before {
-  content: "▾ ";
+.why-arrow.open {
+  transform: rotate(90deg);
 }
