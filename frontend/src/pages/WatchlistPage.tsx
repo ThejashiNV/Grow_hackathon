@@ -65,6 +65,7 @@ export function WatchlistPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState<string | null>(null);
   const [marking, setMarking] = useState(false);
+  const [filter, setFilter] = useState("");
 
   const loadAll = useCallback(async () => {
     try {
@@ -280,9 +281,27 @@ export function WatchlistPage() {
         </div>
       )}
 
+      {/* Search filter */}
+      {intelItems.length > 4 && (
+        <div className="wl-filter-bar">
+          <input
+            className="wl-filter-input"
+            type="text"
+            placeholder="Filter stocks..."
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+          />
+          {filter && (
+            <span className="wl-filter-count">
+              {intelItems.filter(i => i.symbol.toLowerCase().includes(filter.toLowerCase()) || (i.company_name ?? "").toLowerCase().includes(filter.toLowerCase())).length} match
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Intelligence cards grid */}
       <div className="wl-grid">
-        {intelItems.map(item => {
+        {intelItems.filter(i => !filter || i.symbol.toLowerCase().includes(filter.toLowerCase()) || (i.company_name ?? "").toLowerCase().includes(filter.toLowerCase())).map(item => {
           const changeCount = item.changes_since_last_check?.length ?? 0;
           const hasChanges = changeCount > 0 || item.never_seen;
 

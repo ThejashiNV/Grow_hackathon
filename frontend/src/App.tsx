@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Route, HashRouter as Router, Routes } from "react-router-dom";
+import { NavLink, Route, HashRouter as Router, Routes, useNavigate } from "react-router-dom";
 import { ParticleField } from "./components/ParticleField";
 import { api } from "./services/api";
 import { AttentionPage } from "./pages/AttentionPage";
@@ -9,8 +9,54 @@ import { IntelligencePage } from "./pages/IntelligencePage";
 import { WatchlistPage } from "./pages/WatchlistPage";
 import "./App.css";
 
+function useClock() {
+  const [time, setTime] = useState(() => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTime(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+}
+
+function KeyboardNav() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      const routes = ["/", "/feed", "/watchlist", "/intelligence", "/history"];
+      const idx = parseInt(e.key) - 1;
+      if (idx >= 0 && idx < routes.length) navigate(routes[idx]);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [navigate]);
+  return null;
+}
+
+function ScrollToTop() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const handler = () => setShow(window.scrollY > 400);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+  if (!show) return null;
+  return (
+    <button
+      className="scroll-top-btn"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Scroll to top"
+    >
+      ↑
+    </button>
+  );
+}
+
 function App() {
   const [alertCount, setAlertCount] = useState(0);
+  const clock = useClock();
 
   useEffect(() => {
     api.getAttention()
@@ -22,6 +68,7 @@ function App() {
 
   return (
     <Router>
+      <KeyboardNav />
       <ParticleField />
       <div className="app-shell">
         <header className="app-header">
@@ -30,6 +77,7 @@ function App() {
           <div className="header-status">
             <span className="header-dot" />
             LIVE
+            <span className="header-clock">{clock}</span>
           </div>
         </header>
 
@@ -61,6 +109,8 @@ function App() {
             <Route path="/history" element={<HistoryPage />} />
           </Routes>
         </main>
+
+        <ScrollToTop />
 
         <footer className="app-footer">
           <span>GROW v1.0</span>

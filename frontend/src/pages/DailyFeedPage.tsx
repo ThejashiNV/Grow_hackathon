@@ -51,6 +51,28 @@ function changeTypeIcon(type: string) {
   return "•";
 }
 
+function useCountUp(target: number, duration = 600) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    const start = performance.now();
+    let raf: number;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      setVal(Math.round(t * target));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return val;
+}
+
+function AnimCount({ n }: { n: number }) {
+  const v = useCountUp(n);
+  return <>{v}</>;
+}
+
 function MoverTrend({ direction }: { direction: string }) {
   const up = direction === "up";
   const pts = up
@@ -185,27 +207,27 @@ export function DailyFeedPage() {
       {/* Market Overview Stats */}
       <div className="df-overview-bar">
         <div className="df-ov-item">
-          <span className="df-ov-val">{feed.alerts.length}</span>
+          <span className="df-ov-val"><AnimCount n={feed.alerts.length} /></span>
           <span className="df-ov-label">Alerts</span>
         </div>
         <div className="df-ov-sep" />
         <div className="df-ov-item">
-          <span className="df-ov-val">{(feed.event_clusters ?? []).length}</span>
+          <span className="df-ov-val"><AnimCount n={(feed.event_clusters ?? []).length} /></span>
           <span className="df-ov-label">Clusters</span>
         </div>
         <div className="df-ov-sep" />
         <div className="df-ov-item">
-          <span className="df-ov-val">{feed.movers.length}</span>
+          <span className="df-ov-val"><AnimCount n={feed.movers.length} /></span>
           <span className="df-ov-label">Movers</span>
         </div>
         <div className="df-ov-sep" />
         <div className="df-ov-item">
-          <span className="df-ov-val">{feed.news_digest.length}</span>
+          <span className="df-ov-val"><AnimCount n={feed.news_digest.length} /></span>
           <span className="df-ov-label">News</span>
         </div>
         <div className="df-ov-sep" />
         <div className="df-ov-item">
-          <span className="df-ov-val">{Object.keys(feed.sector_summary).length}</span>
+          <span className="df-ov-val"><AnimCount n={Object.keys(feed.sector_summary).length} /></span>
           <span className="df-ov-label">Sectors</span>
         </div>
       </div>

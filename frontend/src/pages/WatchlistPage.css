@@ -225,6 +225,43 @@
   margin-bottom: 0.75rem;
 }
 
+/* ── Filter Bar ── */
+
+.wl-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wl-filter-input {
+  flex: 1;
+  max-width: 280px;
+  background: var(--sw-surface, #0e1520);
+  border: 1px solid var(--sw-border, #1c2636);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  color: var(--sw-text, #c9d1d9);
+  font-size: 0.75rem;
+  font-family: var(--sw-mono, monospace);
+  transition: border-color 0.2s;
+}
+
+.wl-filter-input:focus {
+  outline: none;
+  border-color: var(--sw-accent, #00d4aa);
+}
+
+.wl-filter-input::placeholder {
+  color: var(--sw-muted, #4d5566);
+}
+
+.wl-filter-count {
+  font-size: 0.65rem;
+  color: var(--sw-muted);
+  font-family: var(--sw-mono, monospace);
+}
+
 /* ── Empty State ── */
 
 .wl-empty {
