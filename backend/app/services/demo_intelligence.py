@@ -1272,7 +1272,7 @@ def _build_event_clusters(symbol: str, cfg: dict) -> list[EventClusterOut]:
             sources=sources,
             first_seen=first,
             last_seen=last,
-            impact_score=impact,
+            impact_score=round(impact * 100, 1),
             severity=severity,
             affected_symbols=[symbol],
             summary=summary,

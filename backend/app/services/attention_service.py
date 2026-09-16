@@ -42,13 +42,8 @@ def _apply_sector_wide_flags(bundles: list[ChangeBundle]) -> None:
 async def build_attention_feed(user_id: str) -> AttentionResponse:
     settings = get_settings()
 
-    if settings.demo_mode:
-        from app.services.demo_data import DEMO_SYMBOLS
-
-        symbols = list(DEMO_SYMBOLS)
-    else:
-        watchlist = await watchlist_repository.get_watchlist(user_id)
-        symbols = [s.symbol for s in watchlist.stocks]
+    watchlist = await watchlist_repository.get_watchlist(user_id)
+    symbols = [s.symbol for s in watchlist.stocks]
 
     if not symbols:
         return AttentionResponse(items=[], meaningful_count=0, generated_at=datetime.now(UTC), empty_watchlist=True)

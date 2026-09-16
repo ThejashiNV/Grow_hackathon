@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.config import get_settings
 from app.core.session import get_current_user_id
 from app.repositories import watchlist_repository
 from app.schemas.watchlist import AddStockRequest, Watchlist
@@ -17,6 +18,17 @@ async def add_stock(body: AddStockRequest, user_id: str = Depends(get_current_us
     symbol = body.symbol.strip().upper()
     if not symbol:
         raise HTTPException(status_code=400, detail="Symbol is required")
+
+    if get_settings().demo_mode:
+        from app.services.demo_data import DEMO_SYMBOLS
+
+        if symbol not in DEMO_SYMBOLS:
+            tickers = ", ".join(s.replace(".NS", "") for s in DEMO_SYMBOLS)
+            raise HTTPException(
+                status_code=400,
+                detail=f"'{symbol}' isn't tracked in demo mode. Try one of: {tickers}",
+            )
+
     return await watchlist_repository.add_stock(user_id, symbol)
 
 

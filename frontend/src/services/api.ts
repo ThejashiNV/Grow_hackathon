@@ -21,7 +21,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new ApiError(res.status, text);
+    let message = text;
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed?.detail === "string") message = parsed.detail;
+    } catch {
+      // not JSON — use raw text as-is
+    }
+    throw new ApiError(res.status, message);
   }
   return res.json() as Promise<T>;
 }
